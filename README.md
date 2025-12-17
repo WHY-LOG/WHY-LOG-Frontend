@@ -16,7 +16,7 @@
 |:------:|:------:|:------:|  
 | 사진1 | 사진2 | 사진3 |  
 | FE | FE | FE |  
-| [GitHub](깃허브 링크) | [GitHub](https://github.com/guingguing) | [GitHub](https://github.com/bella411) |
+| [GitHub](https://github.com/BeginnerKJS) | [GitHub](https://github.com/guingguing) | [GitHub](https://github.com/bella411) |
 
 <br>
 
