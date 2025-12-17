@@ -46,8 +46,8 @@ struct YearReportCard: View {
 
                 // 연도 텍스트
                 Text("\(year)년")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundColor(.black)
+                    .font(.PretendardMedium12)
+                    .foregroundColor(.gray525252)
             }
         }
         .buttonStyle(.plain)
