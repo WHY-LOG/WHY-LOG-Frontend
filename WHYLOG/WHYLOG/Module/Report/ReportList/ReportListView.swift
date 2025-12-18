@@ -8,31 +8,28 @@
 import SwiftUI
 
 struct ReportListView: View {
-
+    @Environment(\.dismiss) private var dismiss
 
     private let years = [2025, 2024, 2023]
 
     var body: some View {
         ZStack {
-            
             // Background
             Color(.baseCoral)
                 .ignoresSafeArea()
             
             VStack {
-
-                Top
-                Middle
-                Bottom
+                navigationBar
+                reportList
+                addButton
             }
             .padding(.horizontal, 20)
-
-            
         }
+        .navigationBarBackButtonHidden(true)
     }
     
-    // MARK: - Top
-    private var Top: some View {
+    // MARK: - Navigation Bar
+    private var navigationBar: some View {
         VStack {
             
             // Logo
@@ -46,7 +43,7 @@ struct ReportListView: View {
             // Navigation Bar
             HStack {
                 Button {
-                    // 뒤로가기
+                    dismiss()
                 } label: {
                     Image("arrow_back")
                         .resizable()
@@ -58,15 +55,13 @@ struct ReportListView: View {
                     .font(.PretendardBold16)
                     .foregroundStyle(.gray525252)
                 Spacer()
-                
-
             }
             .padding(.top, 5)
         }
     }
 
-    // MARK: - Middle
-    private var Middle: some View {
+    // MARK: - reportList
+    private var reportList: some View {
         
         // Year Cards
         HStack {
@@ -81,17 +76,16 @@ struct ReportListView: View {
         .padding(.top, 50)
     }
     
-    // Mark: - Bottom
-    private var Bottom: some View {
-        // MARK: - Floating Add Button
-
+    // MARK: - addButton
+    private var addButton: some View {
         VStack {
             Spacer()
             HStack {
                 Spacer()
-                AddButton {
-                    // 생성 화면 이동
-                    print("Add button tapped")
+                NavigationLink {
+                    ReportCreateConfirmView()
+                } label: {
+                    AddButtonUI()
                 }
                 .padding(.trailing, 20)
                 .padding(.bottom, 20)
@@ -100,11 +94,6 @@ struct ReportListView: View {
         }
     }
 }
-
-
-
-
-
 
 #Preview {
     ReportListView()

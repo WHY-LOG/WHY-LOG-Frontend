@@ -13,32 +13,31 @@ struct ReportLoadingView: View {
     private let selectedYear = 2025
     
     var body: some View {
-        
+        NavigationStack{
             ZStack {
                 // Background
                 Color(.baseCoral)
                     .ignoresSafeArea()
                 VStack {
-                    
                     navigationBar
                     Spacer()
                     progressIndicator
                     loadingMessage
                     Spacer()
                     cancelButton
-                    
                 }
                 .padding(.horizontal, 20)
-                
             }
         }
+        .navigationBarBackButtonHidden(true)
+    }
     
     // MARK: - Navigation Bar
     private var navigationBar: some View {
         // Navigation Bar
         HStack(alignment: .top) {
             Button {
-                // 뒤로가기
+                dismiss()
             } label: {
                 Image("arrow_back")
                     .resizable()
@@ -61,14 +60,12 @@ struct ReportLoadingView: View {
                 }
     }
     
-    // MARK: - Middle
+    // MARK: - Loading Message
     private var loadingMessage: some View {
         VStack {
             VStack {
                 Text(attributedString)
                     .font(.PretendardBold20)
-
-                    
                     .padding(.top, 29.37)
                     .padding(.bottom, 29.79)
                     .multilineTextAlignment(.center)
@@ -76,7 +73,6 @@ struct ReportLoadingView: View {
                     .font(.PretendardMedium12)
                     .foregroundStyle(.gray525252)
             }
-            
         }
     }
     
@@ -88,7 +84,7 @@ struct ReportLoadingView: View {
       return string
     }
     
-    // MARK: - Bottom
+    // MARK: - Cancel Button
     private var cancelButton: some View {
         VStack {
             Button {
@@ -101,15 +97,6 @@ struct ReportLoadingView: View {
             .padding(.bottom, 90)
         }
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }
 
 #Preview {

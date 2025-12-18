@@ -8,32 +8,32 @@
 import SwiftUI
 
 struct ReportCreateConfirmView: View {
-    
+    @Environment(\.dismiss) private var dismiss
+
     
     var body: some View {
-        NavigationStack{
             ZStack {
                 // Background
                 Color(.baseCoral)
                     .ignoresSafeArea()
                 VStack {
-                    Top
+                    navigationBar
                     Spacer()
-                    Middle
+                    confirmText
                     Spacer()
-                    Bottom
+                    confirmButton
                 }
                 .padding(.horizontal, 20)
             }
-        }
+        .navigationBarBackButtonHidden(true)
     }
     
-    // MARK: - Top
-    private var Top: some View {
+    // MARK: - Navigation Bar
+    private var navigationBar: some View {
         // Navigation Bar
         HStack(alignment: .top) {
             Button {
-                // 뒤로가기
+                dismiss()
             } label: {
                 Image("arrow_back")
                     .resizable()
@@ -49,8 +49,8 @@ struct ReportCreateConfirmView: View {
         .padding(.top, 28.37)
     }
     
-    // MARK: - Middle
-    private var Middle: some View {
+    // MARK: - Confrim Text
+    private var confirmText: some View {
         VStack {
             Text("2025년 판단 리포트를 만드시겠습니까?")
                 .font(.PretendardBold20)
@@ -60,11 +60,19 @@ struct ReportCreateConfirmView: View {
         }
     }
     
-    // MARK: - Bottom
-    private var Bottom: some View {
-        VStack {
-            OnboardingNavigationBar(title: "완료",action: {},destination: InitializeProfileView())
-            // TODO: 목적지 변경
+    // MARK: - Confirm Button
+    private var confirmButton: some View {
+        NavigationLink {
+                ReportLoadingView()
+        } label: {
+            Text("완료")
+                .foregroundStyle(.white)
+                .font(.PretendardBold16)
+                .padding(.vertical,18)
+                .frame(maxWidth:.infinity)
+                .background(Color.accentCoral)
+                .cornerRadius(18)
+                .padding(.horizontal,18)
         }
     }
 }
