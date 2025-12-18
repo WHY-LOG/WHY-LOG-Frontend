@@ -17,7 +17,7 @@ struct AddButton: View {
                     .fill(.accentBlue)
                     .frame(width: 64, height: 64)
 
-                Image("add")
+                Image("icon_add")
                     .resizable()
                     .scaledToFit()
                     .frame(width: 36, height: 36)
