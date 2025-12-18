@@ -13,11 +13,11 @@ struct YearReportCard: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 12) {
+            VStack(spacing: 14.18) {
 
                 // 카드 본체
                 ZStack {
-                    RoundedRectangle(cornerRadius: 18)
+                    RoundedRectangle(cornerRadius: 17.7)
                         .fill(
                             LinearGradient(
                                 colors: [
@@ -48,6 +48,7 @@ struct YearReportCard: View {
                 Text("\(String(year))년")
                     .font(.PretendardMedium12)
                     .foregroundColor(.gray525252)
+                    
             }
         }
         .buttonStyle(.plain)
