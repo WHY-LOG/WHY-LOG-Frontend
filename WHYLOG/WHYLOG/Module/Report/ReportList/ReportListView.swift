@@ -72,7 +72,7 @@ struct ReportListView: View {
         HStack {
             ForEach(years, id: \.self) { year in
                 Spacer()
-                YearReportCard(year: year) {
+                YearReportCard(year: year, selectedYear: year) {
                     print("\(year) 선택")
                 }
                 Spacer()
