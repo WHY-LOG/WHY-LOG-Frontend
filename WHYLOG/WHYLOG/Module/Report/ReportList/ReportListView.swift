@@ -9,9 +9,11 @@ import SwiftUI
 
 struct ReportListView: View {
     @Environment(\.dismiss) private var dismiss
-
+    @State private var state: ReportListState = .empty
+    @StateObject private var viewModel = ReportListViewModel()
+    
     private let years = [2025, 2024, 2023]
-
+    
     var body: some View {
         ZStack {
             // Background
@@ -20,12 +22,15 @@ struct ReportListView: View {
             
             VStack {
                 navigationBar
-                reportList
+                contentView
                 addButton
             }
             .padding(.horizontal, 20)
         }
         .navigationBarBackButtonHidden(true)
+        .task {
+            await viewModel.fetchReports()
+        }
     }
     
     // MARK: - Navigation Bar
@@ -39,7 +44,7 @@ struct ReportListView: View {
                     .frame(width: 86, height: 22)
                 Spacer()
             }
-
+            
             // Navigation Bar
             HStack {
                 Button {
@@ -59,11 +64,26 @@ struct ReportListView: View {
             .padding(.top, 5)
         }
     }
-
-    // MARK: - reportList
-    private var reportList: some View {
-        
-        // Year Cards
+    
+    // MARK: - Content View
+    private var contentView: some View {
+        Group {
+            switch state {
+            case .empty:
+                emptyStateView
+                
+            case .loaded(let years):
+                reportListView(years)
+                
+            case .networkError:
+                networkErrorView
+            }
+        }
+    }
+    
+    // reportListView
+    private func reportListView(_ years: [Int]) -> some View {
+        // 리포트 카드
         HStack {
             ForEach(years, id: \.self) { year in
                 Spacer()
@@ -75,6 +95,62 @@ struct ReportListView: View {
         }
         .padding(.top, 50)
     }
+    
+    // emptyStateView
+    private var emptyStateView: some View {
+        VStack {
+            Spacer()
+            Image("sentiment_dissatisfied")
+                .resizable()
+                .frame(width: 60, height: 60)
+                .padding(.bottom, 40)
+            Text("아직 생성된 리포트가 없습니다")
+                .font(.PretendardBold20)
+                .foregroundStyle(.gray525252)
+                .padding(.bottom, 16)
+            Text("회고를 바탕으로\n나만의 리포트를 만들어보세요")
+                .font(.PretendardMedium12)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.gray525252)
+        }
+    }
+    
+    // networkErrorView
+    private var networkErrorView: some View {
+        VStack {
+            Spacer()
+            
+            Image("wifi_error")
+                .padding(.bottom, 52.33)
+            
+            Text("네트워크 상태를 확인해주세요")
+                .font(.PretendardBold20)
+                .foregroundStyle(.gray525252)
+            Text("서버와의 통신이 운활하지 않아 데이터를 불러올 수 없습니다")
+                .font(.PretendardMedium12)
+                .foregroundStyle(.gray525252)
+                .padding(.bottom, 20)
+                .padding(.top, 16)
+            
+            Button() {
+                Task {
+                    await viewModel.fetchReports()
+                }
+            } label: {
+                Text("재시도")
+                    .foregroundStyle(.white)
+                    .font(.PretendardMedium12)
+                    .padding(.vertical,11.5)
+                    .frame(maxWidth:.infinity)
+                    .background(Color.accentCoral)
+                    .cornerRadius(8.87)
+                    .padding(.horizontal,48)
+            }
+            
+            Spacer()
+        }
+    }
+    
     
     // MARK: - addButton
     private var addButton: some View {
