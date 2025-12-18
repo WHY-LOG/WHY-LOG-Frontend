@@ -89,20 +89,13 @@ struct ReportListView: View {
             Spacer()
             HStack {
                 Spacer()
-                Button {
-                    print("리포트 생성")
-                } label: {
-                    // TODO: AddButton Component로 변경
-                    Image(systemName: "plus")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 56, height: 56)
-                        .background(.blue)
-                        .clipShape(Circle())
-                        
+                AddButton {
+                    // 생성 화면 이동
+                    print("Add button tapped")
                 }
                 .padding(.trailing, 20)
                 .padding(.bottom, 20)
+                
             }
         }
     }
@@ -111,27 +104,7 @@ struct ReportListView: View {
 
 
 
-    var body: some View {
-        ZStack {
-            Text("리포트 목록")
-            
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    AddButton {
-                        // 생성 화면 이동
-                        print("Add button tapped")
-                    }
-                    .padding(.trailing, 20)
-                    .padding(.bottom, 20)
-                    
-                }
-            }
-        }
 
-    }
-}
 
 #Preview {
     ReportListView()

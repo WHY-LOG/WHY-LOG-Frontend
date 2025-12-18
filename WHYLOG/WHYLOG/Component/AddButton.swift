@@ -12,10 +12,16 @@ struct AddButton: View {
     let action: () -> Void
     var body: some View {
         Button(action: action) {
-            Image(systemName: "plus.circle.fill")
-                .resizable()
-                .frame(width: 63.83, height: 63.83)
-                .foregroundStyle(.accentBlue)
+            ZStack {
+                Circle()
+                    .fill(.accentBlue)
+                    .frame(width: 64, height: 64)
+
+                Image("add")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 36, height: 36)
+            }
         }
     }
 }
