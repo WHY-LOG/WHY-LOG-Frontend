@@ -45,7 +45,7 @@ struct YearReportCard: View {
                 }
 
                 // 연도 텍스트
-                Text("\(year)년")
+                Text("\(String(year))년")
                     .font(.PretendardMedium12)
                     .foregroundColor(.gray525252)
             }
