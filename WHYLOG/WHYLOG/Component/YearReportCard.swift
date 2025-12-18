@@ -9,6 +9,7 @@ import SwiftUI
 
 struct YearReportCard: View {
     let year: Int
+    let selectedYear: Int?
     let action: () -> Void
 
     var body: some View {

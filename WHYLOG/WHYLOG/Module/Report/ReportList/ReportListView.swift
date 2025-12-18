@@ -8,31 +8,28 @@
 import SwiftUI
 
 struct ReportListView: View {
-
+    @Environment(\.dismiss) private var dismiss
 
     private let years = [2025, 2024, 2023]
 
     var body: some View {
         ZStack {
-            
             // Background
             Color(.baseCoral)
                 .ignoresSafeArea()
             
             VStack {
-
-                Top
-                Middle
-                Bottom
+                navigationBar
+                reportList
+                addButton
             }
             .padding(.horizontal, 20)
-
-            
         }
+        .navigationBarBackButtonHidden(true)
     }
     
-    // MARK: - Top
-    private var Top: some View {
+    // MARK: - Navigation Bar
+    private var navigationBar: some View {
         VStack {
             
             // Logo
@@ -46,7 +43,7 @@ struct ReportListView: View {
             // Navigation Bar
             HStack {
                 Button {
-                    // 뒤로가기
+                    dismiss()
                 } label: {
                     Image("arrow_back")
                         .resizable()
@@ -58,21 +55,19 @@ struct ReportListView: View {
                     .font(.PretendardBold16)
                     .foregroundStyle(.gray525252)
                 Spacer()
-                
-
             }
             .padding(.top, 5)
         }
     }
 
-    // MARK: - Middle
-    private var Middle: some View {
+    // MARK: - reportList
+    private var reportList: some View {
         
         // Year Cards
         HStack {
             ForEach(years, id: \.self) { year in
                 Spacer()
-                YearReportCard(year: year) {
+                YearReportCard(year: year, selectedYear: year) {
                     print("\(year) 선택")
                 }
                 Spacer()
@@ -81,55 +76,22 @@ struct ReportListView: View {
         .padding(.top, 50)
     }
     
-    // Mark: - Bottom
-    private var Bottom: some View {
-        // MARK: - Floating Add Button
-        // TODO: AddButton Component로 변경
+    // MARK: - addButton
+    private var addButton: some View {
         VStack {
             Spacer()
             HStack {
                 Spacer()
-                Button {
-                    print("리포트 생성")
+                NavigationLink {
+                    ReportCreateConfirmView()
                 } label: {
-                    // TODO: AddButton Component로 변경
-                    Image(systemName: "plus")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 56, height: 56)
-                        .background(.blue)
-                        .clipShape(Circle())
-                        
+                    AddButtonUI()
                 }
                 .padding(.trailing, 20)
                 .padding(.bottom, 20)
+                
             }
         }
-    }
-}
-
-
-
-
-    var body: some View {
-        ZStack {
-            Text("리포트 목록")
-            
-            VStack {
-                Spacer()
-                HStack {
-                    Spacer()
-                    AddButton {
-                        // 생성 화면 이동
-                        print("Add button tapped")
-                    }
-                    .padding(.trailing, 20)
-                    .padding(.bottom, 20)
-                    
-                }
-            }
-        }
-
     }
 }
 
