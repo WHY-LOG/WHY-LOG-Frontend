@@ -9,71 +9,79 @@ import SwiftUI
 import PhotosUI
 
 struct InitializeProfileView: View {
-    @State private var selectedItems: [PhotosPickerItem] = []
-    @State private var selectedImages: [UIImage] = []
-    @StateObject private var myProfileModel = ProfileModel()
-    @State private var username: String = ""
-    @State private var userEmail: String = ""
+    @EnvironmentObject var profileModel: ProfileModel
+
     var body: some View {
-            ZStack{
-                Color.baseCoral
-                    .ignoresSafeArea()
-                VStack{
-                    HStack(){
-                        Text("프로필 정보를 입력해주세요")
-                            .font(.PretendardBold20)
-                            .foregroundColor(.gray525252)
-                        Spacer()
-                    }.padding(.top,60)
-                    EditableCircleProfileImage(viewModel: myProfileModel,
-                                               isEditable: false)
-                        .padding(.top,65)
-                    PrimaryTextField(placeholder: "이름을 입력하세요", text: $myProfileModel.name)
-                        .padding(.top,32)
-                    PrimaryTextField(placeholder: "이메일을 입력하세요", text: $myProfileModel.email)
-                        .padding(.vertical,24)
-                    
+        ZStack {
+            Color.baseCoral
+                .ignoresSafeArea()
+
+            VStack {
+                HStack {
+                    Text("프로필 정보를 입력해주세요")
+                        .font(.PretendardBold20)
+                        .foregroundColor(.gray525252)
                     Spacer()
-//                    PrimaryButton(title: "완료", action: {}, destination: FirstServiceGuideView())
+                }
+                .padding(.top, 60)
 
-                    PrimaryButton(title: "완료", action: {}, destination: FirstServiceGuideView())
-                    
+                EditableCircleProfileImage(
+                    viewModel: profileModel,
+                    isEditable: true        // ✅ 최초 설정은 수정 가능
+                )
+                .padding(.top, 65)
 
-                        
-//                        Image(systemName: "plus")
-//                            .resizable()
-//                            .frame(width: 30,height: 30)
-//                            .foregroundColor(Color.gray949494)
-//                            .background(){
-//                                Circle()
-//                                .stroke(Color.gray949494, lineWidth: 2)
-//                                .fill(Color.grayE3E3E3)
-//                                .frame(width: 123, height: 123)
-//                    }
-                }.padding(.horizontal,20)
+                PrimaryTextField(
+                    placeholder: "이름을 입력하세요",
+                    text: $profileModel.name
+                )
+                .padding(.top, 32)
+
+                PrimaryTextField(
+                    placeholder: "이메일을 입력하세요",
+                    text: $profileModel.email
+                )
+                .padding(.vertical, 24)
+
+                Spacer()
+
+                PrimaryButton(
+                    title: "완료",
+                    action: {
+                        // TODO: UserDefaults / 서버 저장
+                    },
+                    destination: FirstServiceGuideView()
+                )
             }
+            .padding(.horizontal, 20)
         }
     }
+}
+
 
 struct EditableCircleProfileImage: View {
     @ObservedObject var viewModel: ProfileModel
-    var isEditable: Bool
+    let isEditable: Bool
     
     var body: some View {
         CircleProfileImage(imageState: viewModel.imageState)
-            .overlay(alignment: .bottomTrailing){
-                PhotosPicker(
-                    selection: $viewModel.imageSelection,
-                    matching: .images
-                ){
-                    Image(systemName: "pencil.circle.fill")
-                        .symbolRenderingMode(.multicolor)
-                        .font(.system(size: 30))
-                        .foregroundColor(.accentBlue)
-                }.buttonStyle(.borderless)
+            .overlay(alignment: .bottomTrailing) {
+                if isEditable {
+                    PhotosPicker(
+                        selection: $viewModel.imageSelection,
+                        matching: .images
+                    ) {
+                        Image(systemName: "pencil.circle.fill")
+                            .symbolRenderingMode(.multicolor)
+                            .font(.system(size: 30))
+                            .foregroundColor(.accentBlue)
+                    }
+                    .buttonStyle(.borderless)
+                }
             }
     }
 }
+
 
 struct CircleProfileImage: View {
     let imageState: ProfileModel.ImageState

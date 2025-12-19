@@ -6,13 +6,15 @@
 //
 
 import SwiftUI
+import PhotosUI
 
 struct MyProfileView: View {
-    @StateObject private var profileModel = ProfileModel()
+
+    @EnvironmentObject var profileModel: ProfileModel
     @Environment(\.dismiss) private var dismiss
 
-    @State private var isEditing = false
-    @State private var showAlert = false
+    @State private var isEditing: Bool = false
+    @State private var showAlert: Bool = false
     @State private var alertType: AlertType = .edit
 
     enum AlertType {
@@ -22,7 +24,8 @@ struct MyProfileView: View {
 
     var body: some View {
         ZStack {
-            Color.baseCoral.ignoresSafeArea()
+            Color.baseCoral
+                .ignoresSafeArea()
 
             VStack {
                 navigationBar
@@ -33,6 +36,7 @@ struct MyProfileView: View {
                 )
                 .padding(.top, 40)
 
+                // 이름
                 PrimaryTextField(
                     placeholder: "이름을 입력해주세요",
                     text: $profileModel.name,
@@ -40,6 +44,7 @@ struct MyProfileView: View {
                 )
                 .padding(.top, 32)
 
+                // 이메일
                 PrimaryTextField(
                     placeholder: "이메일을 입력해주세요",
                     text: $profileModel.email,
@@ -49,19 +54,22 @@ struct MyProfileView: View {
 
                 Spacer()
 
+                // 완료 버튼
                 PrimaryButton(
                     title: "완료",
-                    //isDisabled: !isEditing,
                     action: {
                         isEditing = false
-                        // TODO: 저장 로직 (UserDefaults / 서버)
+                        // TODO: UserDefaults / 서버 저장
                     },
                     destination: HomeView()
                 )
+//                .disabled(!isEditing)
+//                .opacity(isEditing ? 1 : 0.5)
                 .padding(.bottom, 24)
             }
             .padding(.horizontal, 20)
 
+            // 삭제 / 수정 Alert
             if showAlert {
                 CustomAlert(
                     title: alertType == .edit
@@ -75,7 +83,7 @@ struct MyProfileView: View {
                         case .edit:
                             isEditing = true
                         case .delete:
-                            // TODO: 프로필 초기화
+                            // TODO: 삭제 로직
                             dismiss()
                         }
                         showAlert = false
@@ -103,7 +111,7 @@ struct MyProfileView: View {
 
             Text("나의 프로필")
                 .font(.PretendardBold16)
-                .foregroundColor(.gray525252)
+                .foregroundStyle(.gray525252)
 
             Spacer()
 
@@ -122,12 +130,3 @@ struct MyProfileView: View {
         .padding(.bottom, 21)
     }
 }
-
-
-
-
-
-#Preview {
-    MyProfileView()
-}
-
