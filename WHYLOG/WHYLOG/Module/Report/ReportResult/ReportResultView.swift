@@ -14,18 +14,27 @@ struct ReportResultView: View {
     let savedEmotions = ["두려움", "회피"]
     @State private var writingText: String = ""
     @StateObject private var graphVM = EmotionGraphViewModel()
-
+    
+    @State private var showAlert = false
+    @State private var alertType: AlertType = .edit
+    @State private var navigateToEdit = false
+    @State private var navigateToHome = false
+    
+    enum AlertType {
+            case edit, delete
+        }
     
     var body: some View {
-        ZStack {
-            // Background
-            Color(.baseCoral)
-                .ignoresSafeArea()
-            
-            // 메인 뷰
-            VStack(spacing: 0) {
+        NavigationStack {
+            ZStack {
+                // Background
+                Color(.baseCoral)
+                    .ignoresSafeArea()
+                
+                // 메인 뷰
+                VStack(spacing: 0) {
                     navigationBar
-
+                    
                     ScrollView {
                         topContent
                         graphBox
@@ -33,14 +42,43 @@ struct ReportResultView: View {
                         writing
                     }
                 }
-            .padding(.horizontal, 20)
-
+                .padding(.horizontal, 20)
+                
                 // 완료 버튼 (레이아웃 무관)
                 VStack {
                     Spacer()
                     confirmButton
                         .padding(.horizontal, 20)
                 }
+                
+                if showAlert {
+                    CustomAlert(
+                        title: alertType == .edit ? "수정하시겠습니까?" : "삭제하시겠습니까?",
+                        message: alertType == .delete ? "삭제 시 해당 내용이 모두 사라집니다." : nil,
+                        action: {
+                            if alertType == .edit {
+                                navigateToEdit = true
+                            } else {
+                                navigateToHome = true
+                            }
+                            showAlert = false
+                        },
+                        cancelAction: {
+                            showAlert = false
+                        }
+                    )
+                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                }
+                
+            }
+            .navigationDestination(isPresented: $navigateToEdit) {
+                // 수정 화면 (예: 리포트 수정 화면)
+                ReportResultView()
+            }
+
+            .navigationDestination(isPresented: $navigateToHome) {
+                CreateRecordView()
+            }
         }
         
         .navigationBarBackButtonHidden(true)
@@ -73,7 +111,7 @@ struct ReportResultView: View {
     // MARK: - Confirm Button
     private var confirmButton: some View {
         NavigationLink {
-            ReportLoadingView()
+            ReportLoadingView() // 이동할 뷰 선택
         } label: {
             Text("완료")
                 .foregroundStyle(.white)
@@ -93,7 +131,19 @@ struct ReportResultView: View {
                     .font(.PretendardBold16)
                     .foregroundStyle(.gray525252)
                 Spacer()
-                Text("수정 삭제")
+                
+                // 수정/삭제 버튼 컴포넌트
+                ActionButtons(
+                    onEdit: {
+                        alertType = .edit
+                        withAnimation { showAlert = true }
+                    },
+                    onDelete: {
+                        alertType = .delete
+                        withAnimation { showAlert = true }
+                    }
+                )
+                .padding(20)
                 
             }
             Text("ㅇㅇㅇ님은 회피주의자 유형이에요.")
