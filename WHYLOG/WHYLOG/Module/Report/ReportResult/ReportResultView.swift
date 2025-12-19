@@ -9,31 +9,42 @@ import SwiftUI
 
 struct ReportResultView: View {
     @Environment(\.dismiss) private var dismiss
+    
+    let savedEmotions = ["두려움", "회피"]
+    @State private var writingText: String = ""
 
+    
     var body: some View {
         ZStack {
             // Background
             Color(.baseCoral)
                 .ignoresSafeArea()
-
+            
+            // 메인 뷰
             VStack(spacing: 0) {
-                navigationBar
+                    navigationBar
 
-                ScrollView {
-                    topContent
-                    graphBox
-                    middleContent
-                    writing
+                    ScrollView {
+                        topContent
+                        graphBox
+                        middleContent
+                        writing
+                    }
                 }
-
-                confirmButton
-            }
             .padding(.horizontal, 20)
+
+                // 완료 버튼 (레이아웃 무관)
+                VStack {
+                    Spacer()
+                    confirmButton
+                        .padding(.horizontal, 20)
+                }
         }
+        
         .navigationBarBackButtonHidden(true)
     }
-
-
+    
+    
     
     // MARK: - Navigation Bar
     private var navigationBar: some View {
@@ -60,7 +71,7 @@ struct ReportResultView: View {
     // MARK: - Confirm Button
     private var confirmButton: some View {
         NavigationLink {
-                ReportLoadingView()
+            ReportLoadingView()
         } label: {
             Text("완료")
                 .foregroundStyle(.white)
@@ -95,11 +106,11 @@ struct ReportResultView: View {
     private var graphBox: some View {
         ZStack {
             Rectangle()
-              .foregroundColor(.clear)
-              .frame(height: 164.9)
-              .background(.white)
-              .cornerRadius(17.7)
-              .padding(.bottom, 14.8)
+                .foregroundColor(.clear)
+                .frame(height: 164.9)
+                .background(.white)
+                .cornerRadius(17.7)
+                .padding(.bottom, 14.8)
         }
     }
     
@@ -112,24 +123,29 @@ struct ReportResultView: View {
                 .foregroundStyle(.gray525252)
             
             Rectangle()
-              .foregroundStyle(.clear)
-              .frame(height: 0.88652)
-              .background(.grayC5C5C5)
-              .padding(.top, 18)
-              .padding(.bottom, 21)
+                .foregroundStyle(.clear)
+                .frame(height: 0.88652)
+                .background(.grayC5C5C5)
+                .padding(.top, 18)
+                .padding(.bottom, 21)
             
             Text("가장 반복된 판단 동기")
                 .font(.PretendardBold16)
                 .foregroundStyle(.gray525252)
                 .padding(.bottom, 11.6)
-            Text("Chip Chip")
+            // Selected Chip
+            HStack {
+                ForEach (savedEmotions, id: \.self) { text in
+                    ChipButton(text: text, state:  .constant(.completed))
+                }
+            }
             
             Rectangle()
-              .foregroundStyle(.clear)
-              .frame(height: 0.88652)
-              .background(.grayC5C5C5)
-              .padding(.top, 35)
-              .padding(.bottom, 21)
+                .foregroundStyle(.clear)
+                .frame(height: 0.88652)
+                .background(.grayC5C5C5)
+                .padding(.top, 35)
+                .padding(.bottom, 21)
             
             Text("당신의 선택을 가장 많이 이끈 기준")
                 .font(.PretendardBold16)
@@ -142,42 +158,47 @@ struct ReportResultView: View {
         }
     }
     
-    
     // MARK: - Writing
     private var writing: some View {
-        VStack (alignment: .leading){
+        VStack(alignment: .leading) {
             Text("리포트를 기반으로 앞으로의 다짐을 적어보아요.")
                 .font(.PretendardBold16)
                 .foregroundStyle(.gray525252)
                 .padding(.top, 17)
                 .padding(.bottom, 6)
             
-            Rectangle()
-              .foregroundColor(.clear)
-              .frame(maxWidth: .infinity, minHeight: 98.40406, maxHeight: 98.40406)
-              .background(.white)
-              .cornerRadius(17.73046)
+            ZStack(alignment: .topLeading) {
+                // 배경
+                RoundedRectangle(cornerRadius: 17.73)
+                    .fill(Color.white)
+                    .frame(height:150)
+                
+                // placeholder
+                if writingText.isEmpty {
+                    Text("다짐 내용을 적어보세요")
+                        .foregroundStyle(.gray949494)
+                        .font(.PretendardMedium12)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 14)
+                        .allowsHitTesting(false)
+                }
+                
+                // 실제 입력
+                TextEditor(text: $writingText)
+                    .font(.PretendardMedium12)
+                    .foregroundStyle(.gray525252)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Color.clear)
+                    .scrollContentBackground(.hidden)
+            }
         }
     }
     
-   
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 }
+    
+
+    
 
 #Preview {
     ReportResultView()
