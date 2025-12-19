@@ -12,7 +12,9 @@ struct ReportListView: View {
     @State private var state: ReportListState = .empty
     @StateObject private var viewModel = ReportListViewModel()
     
-    private let years = [2025, 2024, 2023]
+    @EnvironmentObject var reportStore: ReportStore
+    
+    private let year = 2025
     
     var body: some View {
         ZStack {
@@ -66,35 +68,56 @@ struct ReportListView: View {
     }
     
     // MARK: - Content View
+//    private var contentView: some View {
+//        Group {
+//            switch state {
+//            case .empty:
+//                emptyStateView
+//                
+//            case .loaded(let years):
+//                reportListView(years)
+//                
+//            case .networkError:
+//                networkErrorView
+//            }
+//        }
+//    }
     private var contentView: some View {
-        Group {
-            switch state {
-            case .empty:
-                emptyStateView
-                
-            case .loaded(let years):
-                reportListView(years)
-                
-            case .networkError:
-                networkErrorView
+            Group {
+                if reportStore.hasReport(year: year) {
+                    reportListView([year])
+                } else {
+                    emptyStateView
+                }
             }
         }
-    }
     
     // reportListView
+//    private func reportListView(_ years: [Int]) -> some View {
+//        // 리포트 카드
+//        HStack {
+//            ForEach(years, id: \.self) { year in
+//                Spacer()
+//                YearReportCard(year: year, selectedYear: year) {
+//                    print("\(year) 선택")
+//                }
+//                Spacer()
+//            }
+//        }
+//        .padding(.top, 50)
+//    }
     private func reportListView(_ years: [Int]) -> some View {
-        // 리포트 카드
         HStack {
             ForEach(years, id: \.self) { year in
-                Spacer()
-                YearReportCard(year: year, selectedYear: year) {
-                    print("\(year) 선택")
+                NavigationLink {
+                    ReportResultView(year: year)
+                } label: {
+                    YearReportCard(year: year, selectedYear: year) {}
                 }
-                Spacer()
             }
         }
-        .padding(.top, 50)
     }
+
     
     // emptyStateView
     private var emptyStateView: some View {
@@ -159,7 +182,7 @@ struct ReportListView: View {
             HStack {
                 Spacer()
                 NavigationLink {
-                    ReportCreateConfirmView()
+                    ReportCreateConfirmView(year: 2025)
                 } label: {
                     AddButtonUI()
                 }

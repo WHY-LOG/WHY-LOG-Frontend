@@ -24,6 +24,8 @@ struct ReportResultView: View {
             case edit, delete
         }
     
+    let year: Int
+    
     var body: some View {
         NavigationStack {
             ZStack {
@@ -73,7 +75,7 @@ struct ReportResultView: View {
             }
             .navigationDestination(isPresented: $navigateToEdit) {
                 // 수정 화면 (예: 리포트 수정 화면)
-                ReportResultView()
+                ReportResultView(year: 2025)
             }
 
             .navigationDestination(isPresented: $navigateToHome) {
@@ -91,7 +93,7 @@ struct ReportResultView: View {
         // Navigation Bar
         HStack(alignment: .top) {
             Button {
-                dismiss()
+                dismiss() //TODO: HomeView
             } label: {
                 Image("arrow_back")
                     .resizable()
@@ -111,7 +113,7 @@ struct ReportResultView: View {
     // MARK: - Confirm Button
     private var confirmButton: some View {
         NavigationLink {
-            ReportLoadingView() // 이동할 뷰 선택
+            ReportListView() // 이동할 뷰 선택
         } label: {
             Text("완료")
                 .foregroundStyle(.white)
@@ -249,7 +251,9 @@ struct ReportResultView: View {
     
 
     
-
 #Preview {
-    ReportResultView()
+    NavigationStack {
+        ReportResultView(year: 2025)
+            .environmentObject(ReportStore())
+    }
 }
