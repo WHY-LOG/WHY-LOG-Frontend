@@ -10,7 +10,9 @@ import SwiftUI
 
 struct FirstServiceGuideView: View{
     var body: some View {
-
+        
+        NavigationStack{
+            
             ZStack{
                 Color.baseCoral
                     .ignoresSafeArea()
@@ -20,12 +22,17 @@ struct FirstServiceGuideView: View{
                         Image("swipe2")
                     }
                     HStack(){
+                        
                         Text("WHY를 이렇게 기록해보세요")
+                        
+                        Text("프로필 정보를 입력해주세요")
+                        
                             .font(.PretendardBold20)
                             .foregroundColor(.gray525252)
                         Spacer()
                     }.padding(.top,53)
                     HStack(){
+                        
                         Text("무엇을 했는지 보다,\n왜 그렇게 했는지가 중요합니다")
                             .font(.PretendardMedium16)
                             .foregroundColor(.gray525252)
@@ -38,12 +45,18 @@ struct FirstServiceGuideView: View{
                     }.padding(.top,114)
                     Spacer()
                     PrimaryButton(title: "다음", action: {}, destination: SecondServiceGuideView())
-                    
-                }.padding(.horizontal,20)
+                    Text("무엇을 했는지 보다, 왜 그렇게 했는지가 중요합니다.")
+                        .font(.PretendardMedium16)
+                        .foregroundColor(.gray525252)
+                    Spacer()
+                }.padding(.top,53)
+                Spacer()
                 
-            }
+            }.padding(.horizontal,20)
+            
         }
     }
+}
 
 #Preview {
     FirstServiceGuideView()

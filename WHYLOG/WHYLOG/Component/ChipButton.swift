@@ -22,10 +22,10 @@ struct ChipButton: View {
             }
         }) {
             Text(text)
-                .font(.system(size: 16, weight: .semibold))
+                .font(.PretendardSemiBold16)
                 .padding(.horizontal, 21)
                 .frame(height: 37)
-                .foregroundColor(textColor)
+                .foregroundColor(textColor) //foregroundStyle
                 .background(
                     RoundedRectangle(cornerRadius: 20)
                         .fill(backgroundColor)
@@ -42,7 +42,7 @@ struct ChipButton: View {
     var textColor: Color {
         switch state {
         case .unselected:
-            return Color(red: 0.32, green: 0.32, blue: 0.32)
+            return Color.gray525252
         case .selected:
             return Color(red: 1, green: 0.55, blue: 0)
         case .completed:
@@ -56,9 +56,9 @@ struct ChipButton: View {
         case .unselected:
             return Color.white
         case .selected:
-            return Color(red: 1, green: 0.87, blue: 0.7)
+            return Color.accentOrange
         case .completed:
-            return Color(red: 1, green: 0.87, blue: 0.7)
+            return Color.accentOrange
         }
     }
     
@@ -66,7 +66,7 @@ struct ChipButton: View {
     var borderColor: Color {
         switch state {
         case .unselected:
-            return Color(red: 0.89, green: 0.89, blue: 0.89)
+            return Color.grayC5C5C5
         case .selected:
             return Color(red: 1, green: 0.55, blue: 0)
         case .completed:

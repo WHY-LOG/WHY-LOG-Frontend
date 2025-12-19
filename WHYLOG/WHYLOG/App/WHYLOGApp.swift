@@ -9,9 +9,12 @@ import SwiftUI
 
 @main
 struct WHYLOGApp: App {
+    @StateObject private var reportStore = ReportStore()
+    
     var body: some Scene {
         WindowGroup {
             LoginView()
+
         }
     }
 }
