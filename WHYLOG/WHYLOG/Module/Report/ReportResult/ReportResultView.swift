@@ -113,7 +113,7 @@ struct ReportResultView: View {
     // MARK: - Confirm Button
     private var confirmButton: some View {
         NavigationLink {
-            ReportListView() // 이동할 뷰 선택
+            HomeView() // 이동할 뷰 선택
         } label: {
             Text("완료")
                 .foregroundStyle(.white)
