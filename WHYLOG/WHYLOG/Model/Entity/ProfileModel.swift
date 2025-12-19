@@ -59,4 +59,12 @@ class ProfileModel: ObservableObject {
             }
         }
     }
+    
+    // 프로필 디폴트 값 (삭제 시 적용됨)
+    func deleteProfile() {
+        name = ""
+        email = ""
+        imageSelection = nil
+        imageState = .empty
+    }
 }
