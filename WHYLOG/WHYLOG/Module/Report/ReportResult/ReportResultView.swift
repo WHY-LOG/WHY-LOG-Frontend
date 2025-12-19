@@ -143,7 +143,6 @@ struct ReportResultView: View {
                         withAnimation { showAlert = true }
                     }
                 )
-                .padding(20)
                 
             }
             Text("ㅇㅇㅇ님은 회피주의자 유형이에요.")

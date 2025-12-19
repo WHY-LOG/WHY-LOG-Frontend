@@ -13,14 +13,14 @@ struct ActionButtons: View {
     let onDelete: () -> Void
     
     var body: some View {
-        HStack(spacing: 32) {
+        HStack(spacing: 16.84) {
             Button(action: onEdit) {
-                Image(systemName: "pencil")
-                    .font(.system(size: 20))
+                Image("edit")
+                   // .font(.system(size: 20))
             }
             Button(action: onDelete) {
-                Image(systemName: "trash")
-                    .font(.system(size: 20))
+                Image("delete")
+                    //.font(.system(size: 20))
             }
         }
         .foregroundStyle(Color.gray525252)
