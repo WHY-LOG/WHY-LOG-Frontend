@@ -35,7 +35,7 @@ struct InitializeProfileView: View {
                     Spacer()
 //                    PrimaryButton(title: "완료", action: {}, destination: FirstServiceGuideView())
 
-                    PrimaryButton(title: "완료", action: {}, destination: ContentView())
+                    PrimaryButton(title: "완료", action: {}, destination: FirstServiceGuideView())
                     
 
                         
@@ -112,67 +112,7 @@ struct ProfileImage: View{
     }
 }
 
-<<<<<<< HEAD
-=======
-struct EditableCircleProfileImage: View {
-    @ObservedObject var viewModel: ProfileModel
-    
-    var body: some View {
-        CircleProfileImage(imageState: viewModel.imageState)
-            .overlay(alignment: .bottomTrailing){
-                PhotosPicker(
-                    selection: $viewModel.imageSelection,
-                    matching: .images
-                ){
-                    Image(systemName: "pencil.circle.fill")
-                        .symbolRenderingMode(.multicolor)
-                        .font(.system(size: 30))
-                        .foregroundColor(.accentBlue)
-                }.buttonStyle(.borderless)
-            }
-    }
-}
 
-struct CircleProfileImage: View {
-    let imageState: ProfileModel.ImageState
-    var body: some View{
-        ProfileImage(imageState: imageState)
-            .frame(width: 123, height: 123)
-            .clipShape(Circle())
-            .background{
-                Circle()
-                    .fill(
-                        LinearGradient(colors: [.yellow, .orange],
-                                       startPoint: .top,
-                                       endPoint: .bottom)
-                    )
-            }
-    }
-}
-
-struct ProfileImage: View{
-    let imageState: ProfileModel.ImageState
-    var body: some View{
-        switch imageState{
-        case .success(let image):
-            image
-                .resizable()
-                .scaledToFit()
-        case .loading:
-            ProgressView()
-        case .empty:
-            Image(systemName: "person.fill")
-                .font(.system(size: 40, weight: .bold))
-                .foregroundColor(.white)
-        case .failure:
-            Image(systemName: "exclamationmark.triangle.fill")
-                .font(.system(size: 40, weight: .bold))
-                .foregroundColor(.white)
-        }
-    }
-}
-
->>>>>>> ad7f540bcef962214d2d7ce3b4555086ca9a3779
 
 #Preview {
     InitializeProfileView()
