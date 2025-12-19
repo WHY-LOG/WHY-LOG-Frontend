@@ -35,7 +35,7 @@ struct HomeView: View {
                             .foregroundColor(.gray525252)
                     }
                     NavigationLink {
-                        ReportListView()
+                        MyProfileView()
                     } label: {
                         Image("user")
                             .resizable()

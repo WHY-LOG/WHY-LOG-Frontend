@@ -25,7 +25,8 @@ struct InitializeProfileView: View {
                             .foregroundColor(.gray525252)
                         Spacer()
                     }.padding(.top,60)
-                    EditableCircleProfileImage(viewModel: myProfileModel)
+                    EditableCircleProfileImage(viewModel: myProfileModel,
+                                               isEditable: false)
                         .padding(.top,65)
                     PrimaryTextField(placeholder: "이름을 입력하세요", text: $myProfileModel.name)
                         .padding(.top,32)
@@ -56,6 +57,7 @@ struct InitializeProfileView: View {
 
 struct EditableCircleProfileImage: View {
     @ObservedObject var viewModel: ProfileModel
+    var isEditable: Bool
     
     var body: some View {
         CircleProfileImage(imageState: viewModel.imageState)

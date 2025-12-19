@@ -11,6 +11,7 @@ import SwiftUI
 struct PrimaryTextField: View {
     let placeholder: String
     @Binding var text: String
+    var isDisabled: Bool = false
     
     var body: some View {
         TextField("", text: $text, prompt: Text(placeholder).foregroundColor(.gray949494)) // placeholder 색상 지정
