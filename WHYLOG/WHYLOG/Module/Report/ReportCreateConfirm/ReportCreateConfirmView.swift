@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ReportCreateConfirmView: View {
     @Environment(\.dismiss) private var dismiss
-
+    let year: Int
     
     var body: some View {
             ZStack {
@@ -63,7 +63,7 @@ struct ReportCreateConfirmView: View {
     // MARK: - Confirm Button
     private var confirmButton: some View {
         NavigationLink {
-                ReportLoadingView()
+            ReportLoadingView(year: 2025)
         } label: {
             Text("완료")
                 .foregroundStyle(.white)
@@ -78,6 +78,6 @@ struct ReportCreateConfirmView: View {
 }
 
 #Preview {
-    ReportCreateConfirmView()
+    ReportCreateConfirmView(year: 2025)
 }
 
