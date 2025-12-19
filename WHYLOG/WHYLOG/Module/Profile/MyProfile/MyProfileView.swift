@@ -83,7 +83,8 @@ struct MyProfileView: View {
                         case .edit:
                             isEditing = true
                         case .delete:
-                            // TODO: 삭제 로직
+                            profileModel.deleteProfile()
+                            isEditing = false
                             dismiss()
                         }
                         showAlert = false
