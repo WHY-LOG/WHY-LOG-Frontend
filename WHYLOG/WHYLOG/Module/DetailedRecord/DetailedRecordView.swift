@@ -126,7 +126,7 @@ struct DetailedRecordView: View {
     // MARK: - bottom
     var bottom: some View {
         VStack() {
-            OnboardingNavigationBar(title: "완료",action: {},destination: InitializeProfileView()) //도착 수정 -> 홈 뷰
+            PrimaryButton(title: "완료",action: {},destination: InitializeProfileView()) //도착 수정 -> 홈 뷰
         }
     }
 }
