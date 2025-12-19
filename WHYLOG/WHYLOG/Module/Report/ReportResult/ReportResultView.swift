@@ -7,11 +7,13 @@
 
 import SwiftUI
 
+
 struct ReportResultView: View {
     @Environment(\.dismiss) private var dismiss
     
     let savedEmotions = ["두려움", "회피"]
     @State private var writingText: String = ""
+    @StateObject private var graphVM = EmotionGraphViewModel()
 
     
     var body: some View {
@@ -104,15 +106,14 @@ struct ReportResultView: View {
     
     // MARK: - Graph Box
     private var graphBox: some View {
-        ZStack {
-            Rectangle()
-                .foregroundColor(.clear)
-                .frame(height: 164.9)
-                .background(.white)
-                .cornerRadius(17.7)
-                .padding(.bottom, 14.8)
-        }
+        EmotionGraphView(items: graphVM.items)
+            .frame(height: 164.9)
+            .padding(.bottom, 14.8)
+            .onAppear {
+                graphVM.loadMock()
+            }
     }
+
     
     // MARK: - Middle Content
     private var middleContent: some View {
@@ -144,7 +145,7 @@ struct ReportResultView: View {
                 .foregroundStyle(.clear)
                 .frame(height: 0.88652)
                 .background(.grayC5C5C5)
-                .padding(.top, 35)
+                .padding(.top, 30)
                 .padding(.bottom, 21)
             
             Text("당신의 선택을 가장 많이 이끈 기준")
