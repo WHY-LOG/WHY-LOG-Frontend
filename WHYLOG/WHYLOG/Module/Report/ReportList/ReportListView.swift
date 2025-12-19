@@ -92,7 +92,7 @@ struct ReportListView: View {
             }
         }
     
-    // reportListView
+    // MARK: - reportListView
 //    private func reportListView(_ years: [Int]) -> some View {
 //        // 리포트 카드
 //        HStack {
@@ -106,17 +106,42 @@ struct ReportListView: View {
 //        }
 //        .padding(.top, 50)
 //    }
+//    private func reportListView(_ years: [Int]) -> some View {
+//        HStack {
+//            ForEach(years, id: \.self) { year in
+//                NavigationLink {
+//                    ReportResultView(year: year)
+//                } label: {
+//                    YearReportCard(
+//                        year: year,
+//                        selectedYear: year
+//                    ) {
+//                    }
+//                }
+//            }
+//        }
+//    }
     private func reportListView(_ years: [Int]) -> some View {
-        HStack {
-            ForEach(years, id: \.self) { year in
-                NavigationLink {
-                    ReportResultView(year: year)
-                } label: {
-                    YearReportCard(year: year, selectedYear: year) {}
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 16) {
+                ForEach(years, id: \.self) { year in
+                    NavigationLink {
+                        ReportResultView(year: year)
+                    } label: {
+                        YearReportCard(
+                            year: year,
+                            selectedYear: year
+                        )
+                    }
                 }
             }
+            .padding(.horizontal, 20)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .padding(.top, 50)
     }
+
+
 
     
     // emptyStateView

@@ -10,6 +10,8 @@ import SwiftUI
 struct ReportLoadingView: View {
     @EnvironmentObject var reportStore: ReportStore
     @State private var goToResult = false
+    @State private var loadingTask: Task<Void, Never>?
+    @Environment(\.dismiss) private var dismiss
 
     let year: Int
 
@@ -29,19 +31,21 @@ struct ReportLoadingView: View {
             }
             .padding(.horizontal, 20)
         }
-        // ✅ 로딩 → 결과 뷰로 이동
+        // 로딩 → 결과 뷰로 이동
         .navigationDestination(isPresented: $goToResult) {
             ReportResultView(year: 2025)
         }
-        .task {
-            // 임시 로딩
-            try? await Task.sleep(nanoseconds: 1_500_000_000)
-
-            // 리포트 생성
-            reportStore.createReport(year: year)
-
-            // 결과 화면으로 이동
-            goToResult = true
+        .onAppear {
+            loadingTask = Task {
+                try? await Task.sleep(nanoseconds: 1_500_000_000)
+                
+                if Task.isCancelled { return }
+                
+                reportStore.createReport(year: year)
+                await MainActor.run {
+                    goToResult = true   // 화면 이동 트리거
+                }
+            }
         }
         .navigationBarBackButtonHidden(true)
     }
@@ -80,7 +84,8 @@ struct ReportLoadingView: View {
     // MARK: - Cancel Button
     private var cancelButton: some View {
         Button {
-            // 필요하면 나중에 취소 로직 추가
+            loadingTask?.cancel()
+            dismiss()
         } label: {
             Text("불러오기 취소")
                 .font(.PretendardMedium12)
