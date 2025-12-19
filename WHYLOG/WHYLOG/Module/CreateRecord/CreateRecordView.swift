@@ -117,7 +117,7 @@ struct CreateRecordView: View {
             }
             .scrollIndicators(.hidden)
             
-            OnboardingNavigationBar(title: "완료",action: {},destination: InitializeProfileView()) //도착 수정
+            OnboardingNavigationBar(title: "완료",action: {},destination: InitializeProfileView()) //도착 수정  -> 홈 뷰
         }
     }
 }
