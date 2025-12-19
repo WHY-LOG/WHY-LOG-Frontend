@@ -13,10 +13,8 @@ struct WHYLOGApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
-                ReportListView()
-            }
-            .environmentObject(reportStore)
+            LoginView()
+
         }
     }
 }
