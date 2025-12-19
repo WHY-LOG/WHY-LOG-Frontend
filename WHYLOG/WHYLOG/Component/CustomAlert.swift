@@ -53,7 +53,7 @@ struct CustomAlert: View {
             .padding(24)
             .background(Color.white)
             .cornerRadius(24)
-            .padding(.horizontal, 40)
+            .padding(.horizontal, 20) // 40 -> 20 으로 변경 했습니다
         }
     }
 }
