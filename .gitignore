@@ -5,6 +5,15 @@
 xcuserdata/
 *.xcuserstate
 
+# Xcode build
+DerivedData/
+build/
+
+# SwiftPM
+.swiftpm/
+
+# Logs
+*.log
 # Derived data
 DerivedData/
 
