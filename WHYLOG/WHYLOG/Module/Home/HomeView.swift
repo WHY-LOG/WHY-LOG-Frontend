@@ -26,7 +26,7 @@ struct HomeView: View {
                     EmotionDropdown()
                     Spacer()
                     NavigationLink {
-                        ReportListView()
+                        //ReportListView()
                     } label: {
                         Image(systemName: "text.document")
                             .resizable()
