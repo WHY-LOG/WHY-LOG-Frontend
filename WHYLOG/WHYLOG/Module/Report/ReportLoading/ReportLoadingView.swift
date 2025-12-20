@@ -8,16 +8,19 @@
 import SwiftUI
 
 struct ReportLoadingView: View {
-    @EnvironmentObject var reportStore: ReportStore
+    @Environment(\.dismiss) private var dismiss
+    
+    @State private var activeDotIndex: Int = 0
+    private let dotCount = 3
+
+
     @State private var goToResult = false
     @State private var loadingTask: Task<Void, Never>?
-    @Environment(\.dismiss) private var dismiss
 
     let year: Int
 
     var body: some View {
         ZStack {
-            // Background
             Color(.baseCoral)
                 .ignoresSafeArea()
 
@@ -31,23 +34,27 @@ struct ReportLoadingView: View {
             }
             .padding(.horizontal, 20)
         }
-        // 로딩 → 결과 뷰로 이동
         .navigationDestination(isPresented: $goToResult) {
-            ReportResultView(year: 2025)
+            ReportResultView(year: year)
         }
         .onAppear {
-            loadingTask = Task {
-                try? await Task.sleep(nanoseconds: 1_500_000_000)
-                
-                if Task.isCancelled { return }
-                
-                reportStore.createReport(year: year)
-                await MainActor.run {
-                    goToResult = true   // 화면 이동 트리거
-                }
-            }
+            startLoading()
         }
         .navigationBarBackButtonHidden(true)
+    }
+
+    // MARK: - Loading Logic
+    private func startLoading() {
+        loadingTask = Task {
+            // 나중에 여기서 createReport API 호출
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+
+            if Task.isCancelled { return }
+
+            await MainActor.run {
+                goToResult = true
+            }
+        }
     }
 
     // MARK: - Navigation Bar
@@ -62,9 +69,19 @@ struct ReportLoadingView: View {
         .padding(.top, 28)
     }
 
-    // MARK: - Progress Indicator
+    // MARK: - Progress Indicator (점 로딩)
     private var progressIndicator: some View {
-        Text("로 딩 중")
+        HStack(spacing: 10) {
+            ForEach(0..<dotCount, id: \.self) { index in
+                Circle()
+                    .fill(index == activeDotIndex ? Color.accentCoral : Color.grayD9D9D9)
+                    .frame(width: 10, height: 10)
+                    .animation(.easeInOut(duration: 0.25), value: activeDotIndex)
+            }
+        }
+        .onAppear {
+            startDotAnimation()
+        }
     }
 
     // MARK: - Loading Message
@@ -93,7 +110,16 @@ struct ReportLoadingView: View {
         }
         .padding(.bottom, 90)
     }
+    
+    // MARK: - Dot Animation
+    private func startDotAnimation() {
+        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+            activeDotIndex = (activeDotIndex + 1) % dotCount
+        }
+    }
 }
+
+
 
 #Preview {
     ReportLoadingView(year: 2025)
