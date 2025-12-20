@@ -9,7 +9,8 @@ enum APIEndpoint {
 
     // MARK: - Report
     case createReport(userId: Int)
-    case fetchReports(userId: Int)
+    case fetchReports(userId: Int) // 리스트 조회
+    case fetchReport(userId: Int, year: Int) // 단일 리포트 조회
     case updateReport(userId: Int, reportId: Int)
     case deleteReport(userId: Int, reportId: Int)
 
@@ -29,11 +30,13 @@ enum APIEndpoint {
 // path/method
 extension APIEndpoint {
 
+    //path
     var path: String {
         switch self {
 
         case .createReport(let userId),
-             .fetchReports(let userId):
+             .fetchReports(let userId),
+             .fetchReport(let userId, _):
             return "/api/users/\(userId)/reports"
 
         case .updateReport(let userId, let reportId),
@@ -58,9 +61,10 @@ extension APIEndpoint {
         }
     }
 
+    // method
     var method: HTTPMethod {
         switch self {
-        case .fetchReports, .fetchUser, .fetchRecords:
+        case .fetchReports, .fetchReport, .fetchUser, .fetchRecords:
             return .get
         case .createReport, .createUser, .createRecord:
             return .post
