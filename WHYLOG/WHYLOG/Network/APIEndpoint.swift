@@ -10,7 +10,6 @@ enum APIEndpoint {
     // MARK: - Report
     case createReport(userId: Int)
     case fetchReports(userId: Int) // 리스트 조회
-    case fetchReport(userId: Int, year: Int) // 단일 리포트 조회
     case updateReport(userId: Int, reportId: Int)
     case deleteReport(userId: Int, reportId: Int)
 
@@ -22,12 +21,17 @@ enum APIEndpoint {
 
     // MARK: - Record
     case createRecord(userId: Int)
-    case fetchRecords(userId: Int)
+    case fetchRecords(
+        userId: Int,
+        year: Int,
+        month: Int,
+        categoryId: Int?
+    )
     case updateRecord(userId: Int, recordId: Int)
     case deleteRecord(userId: Int, recordId: Int)
 }
 
-// path/method
+// MARK: -
 extension APIEndpoint {
 
     //path
@@ -35,8 +39,7 @@ extension APIEndpoint {
         switch self {
 
         case .createReport(let userId),
-             .fetchReports(let userId),
-             .fetchReport(let userId, _):
+             .fetchReports(let userId):
             return "/api/users/\(userId)/reports"
 
         case .updateReport(let userId, let reportId),
@@ -52,8 +55,10 @@ extension APIEndpoint {
             return "/api/user/\(userId)"
 
         case .createRecord(let userId),
-             .fetchRecords(let userId):
+             .fetchRecords(let userId, _, _, _):
             return "/api/users/\(userId)/records"
+
+
 
         case .updateRecord(let userId, let recordId),
              .deleteRecord(let userId, let recordId):
@@ -64,7 +69,7 @@ extension APIEndpoint {
     // method
     var method: HTTPMethod {
         switch self {
-        case .fetchReports, .fetchReport, .fetchUser, .fetchRecords:
+        case .fetchReports, .fetchUser, .fetchRecords:
             return .get
         case .createReport, .createUser, .createRecord:
             return .post
@@ -74,5 +79,26 @@ extension APIEndpoint {
             return .delete
         }
     }
+    
+    // 쿼리 파라미터
+    var queryParameters: [String: Any]? {
+            switch self {
+
+            case .fetchRecords(_, let year, let month, let categoryId):
+                var params: [String: Any] = [
+                    "year": year,
+                    "month": month
+                ]
+
+                if let categoryId {
+                    params["categoryId"] = categoryId
+                }
+
+                return params
+
+            default:
+                return nil
+            }
+        }
 }
 
