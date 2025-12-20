@@ -19,3 +19,5 @@ DerivedData/
 
 # SwiftPM
 .build/
+WHYLOG/WHYLOG.xcodeproj/project.xcworkspace/xcuserdata/
+WHYLOG/WHYLOG.xcodeproj/xcuserdata/
