@@ -5,60 +5,41 @@
 //  Created by 김진서 on 12/20/25.
 //
 
+//
+//  ReportResultViewModel.swift
+//  WHYLOG
+//
+
 import Foundation
 import Combine
 
 @MainActor
 final class ReportResultViewModel: ObservableObject {
 
-    @Published var report: ReportResultDTO?
+    // MARK: - View State
+    @Published var year: Int = 0
     @Published var dominantTypes: [String] = []
+    @Published var summaryText: String = ""
+    @Published var standardText: String = ""
+    @Published var graphItems: [EmotionGraphItem] = []
 
-    private let reportService = ReportService()
+    // MARK: - Mock (API 붙이기 전)
+    func loadMock(year: Int) {
+        self.year = year
+        self.dominantTypes = ["회피", "책임감"]
 
-    // MARK: - Load
-    func loadReport(userId: Int, year: Int) async {
-        do {
-            let report = try await reportService.fetchReport(
-                userId: userId,
-                year: year
-            )
+        self.summaryText =
+        "\(year)년 당신의 판단은\n회피(40%)와 책임감(30%)에서 시작되었습니다."
 
-            self.report = report
-            calculateDominantTypes(from: report.graphData)
+        self.standardText =
+        "당신은 반복된 선택을 통해 자신만의 판단 기준을 만들어가고 있습니다."
 
-        } catch {
-            print("❌ Failed to load report:", error)
-        }
-    }
-
-    // MARK: - Business Logic
-    private func calculateDominantTypes(from data: [GraphDataDTO]) {
-        let maxPercent = data.map { $0.percent }.max() ?? 0
-
-        dominantTypes = data
-            .filter { $0.percent == maxPercent }
-            .map { $0.categoryName }
-    }
-    
-    // MARK: - Summary Text
-    var summaryText: String {
-        guard let report = report else { return "" }
-
-        let topTwo = report.graphData
-            .sorted { $0.percent > $1.percent }
-            .prefix(2)
-
-        let text = topTwo
-            .map { "\($0.categoryName)(\($0.percent)%)" }
-            .joined(separator: "와 ")
-
-        return "\(report.year)년 당신의 판단은\n\(text)에서 시작되었습니다."
-    }
-
-    // MARK: - AI 답변
-    var standardText: String {
-        report?.standard ?? ""
+        self.graphItems = [
+            EmotionGraphItem(type: .avoidance, ratio: 0.4),
+            EmotionGraphItem(type: .responsibility, ratio: 0.3),
+            EmotionGraphItem(type: .expectation, ratio: 0.2),
+            EmotionGraphItem(type: .fear, ratio: 0.1)
+        ]
     }
 }
 
