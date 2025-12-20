@@ -35,4 +35,9 @@ struct ProfileService {
             body: body
         )
     }
+    func deleteProfile() async throws {
+        let _: APIResponse<String> = try await NetworkClient.request(
+            endpoint: .deleteUser(userId: userId)
+        )
+    }
 }

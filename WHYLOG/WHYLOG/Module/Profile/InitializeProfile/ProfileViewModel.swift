@@ -12,16 +12,19 @@ import SwiftUI
 
 @MainActor
 class ProfileViewModel: ObservableObject {
-    // UI State
+    // MARK: - UI State
     @Published var name: String = ""
     @Published var email: String = ""
+    @Published var imgUrl: String = ""
     @Published var isSaveSuccess: Bool = false
+    @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
     @Published private(set) var imageState: ProfileModel.ImageState = .empty
     
-    // Dependencies
+    // MARK: - Dependencies
     private let service = ProfileService()
     
-    // Image Selection
+    // MARK: - Image Selection
     @Published var imageSelection: PhotosPickerItem? {
         didSet {
             if let imageSelection {
@@ -32,49 +35,77 @@ class ProfileViewModel: ObservableObject {
         }
     }
     
+    // 유효성 검사
     var canSave: Bool {
         !name.trimmingCharacters(in: .whitespaces).isEmpty &&
         !email.trimmingCharacters(in: .whitespaces).isEmpty
     }
+
+    // MARK: - API Actions
+
+    /// 1. 프로필 초기 생성 (POST) - 회원가입/초기설정 시 사용
     func save() async {
-            guard canSave else { return } // 필수 입력값 재검증
+        guard canSave else { return }
+        isLoading = true
+        defer { isLoading = false }
 
-            do {
-                // 서버 응답 본문이 비어있거나 모델과 달라도 Status 200이면 성공 처리하기 위해 try await
-                try await service.createProfile(name: name, email: email, imgUrl: "")
-                
-                // 여기까지 오면 성공
-                self.isSaveSuccess = true
-                print("✅ 저장 성공 및 화면 전환 준비 완료")
-            } catch {
-                // 만약 에러가 났지만 이미 서버 로그에 200이 찍혔다면,
-                // 이는 디코딩 에러일 뿐 저장은 성공한 것이므로 true로 설정할 수 있습니다.
-                // (서버 응답 모델을 [String: String] 등으로 유연하게 바꿨다면 이 문제는 사라집니다.)
-                print("저장 중 알 수 없는 상태 발생: \(error)")
-                
-                // 실제 에러 상황(400, 500 등)에서는 false 유지
-                self.isSaveSuccess = false
-            }
+        do {
+            try await service.createProfile(name: name, email: email, imgUrl: imgUrl)
+            self.isSaveSuccess = true
+            print("✅ 프로필 생성 성공")
+        } catch {
+            self.errorMessage = "저장 중 에러 발생: \(error.localizedDescription)"
+            self.isSaveSuccess = false
         }
+    }
 
-    // MARK: - Actions
-    
-    /// 초기 데이터 로드
-    func loadInitialData() async {
+    /// 2. 프로필 정보 가져오기 (GET) - 마이페이지 진입 시 사용
+    func fetchProfile() async {
+        isLoading = true
+        defer { isLoading = false }
+        
         do {
             let data = try await service.getProfile()
             self.name = data.name
             self.email = data.email
+            self.imgUrl = data.imgUrl ?? ""
             
-            if let url = URL(string: data.imgUrl) {
+            if let urlString = data.imgUrl, let url = URL(string: urlString) {
                 await downloadImage(from: url)
             }
         } catch {
-            print("데이터 로드 실패: \(error)")
+            self.errorMessage = "데이터 로드 실패: \(error.localizedDescription)"
         }
     }
 
-    // MARK: - Helper Methods
+    /// 3. 프로필 정보 업데이트 (PUT) - 마이페이지 수정 완료 시 사용
+    func saveProfile() async {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            try await service.updateProfile(name: name, email: email, imgUrl: imgUrl)
+            print("✅ 프로필 수정 성공")
+        } catch {
+            self.errorMessage = "수정 실패: \(error.localizedDescription)"
+        }
+    }
+
+    /// 4. 프로필 삭제 (DELETE)
+    func deleteProfile() async -> Bool {
+        isLoading = true
+        defer { isLoading = false }
+        
+        do {
+            try await service.deleteProfile()
+            return true
+        } catch {
+            self.errorMessage = "삭제 실패: \(error.localizedDescription)"
+            return false
+        }
+    }
+
+    // MARK: - Helper Methods (Image)
     
     private func loadSelectedImage(from selection: PhotosPickerItem) {
         imageState = .loading(Progress())
@@ -84,6 +115,7 @@ class ProfileViewModel: ObservableObject {
                 case .success(let data?):
                     if let uiImage = UIImage(data: data) {
                         self.imageState = .success(Image(uiImage: uiImage))
+                        // TODO: 필요시 여기서 이미지 서버 업로드 API 호출
                     }
                 default:
                     self.imageState = .empty

@@ -9,6 +9,7 @@ import Foundation
 import SwiftUI
 
 struct HomeView: View {
+    @StateObject private var profileViewModel = ProfileViewModel()
     @State private var selectedYear: Int = 2025
     @State private var selectedMonth: MonthListState = .Mar
     
@@ -35,7 +36,7 @@ struct HomeView: View {
                             .foregroundColor(.gray525252)
                     }
                     NavigationLink {
-                        MyProfileView()
+                        MyProfileView(viewModel: profileViewModel)
                     } label: {
                         Image("user")
                             .resizable()
@@ -77,6 +78,10 @@ struct HomeView: View {
                             })
                         }
                     }
+                }
+                HStack{
+                    Image("swipe")
+                    Image("Swipe2")
                 }
                 Spacer()
                 ScrollView{

@@ -10,7 +10,7 @@ import PhotosUI
 
 struct MyProfileView: View {
 
-    @EnvironmentObject var viewModel: ProfileViewModel
+    @StateObject var viewModel: ProfileViewModel
     @Environment(\.dismiss) private var dismiss
 
     @State private var isEditing: Bool = false
@@ -59,7 +59,7 @@ struct MyProfileView: View {
                     title: "완료",
                     action: {
                         Task {
-                            await viewModel.save() // 서버에 POST(PUT) 요청
+                            await viewModel.saveProfile() // 서버에 POST(PUT) 요청
                                 isEditing = false
                             }
                     },
@@ -132,4 +132,8 @@ struct MyProfileView: View {
         .padding(.top, 28.37)
         .padding(.bottom, 21)
     }
+}
+#Preview {
+    // 통합된 ProfileViewModel을 주입
+    MyProfileView(viewModel: ProfileViewModel())
 }
