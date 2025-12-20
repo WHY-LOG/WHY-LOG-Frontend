@@ -10,7 +10,7 @@ import PhotosUI
 
 struct MyProfileView: View {
 
-    @EnvironmentObject var profileModel: ProfileModel
+    @StateObject var viewModel: ProfileViewModel
     @Environment(\.dismiss) private var dismiss
 
     @State private var isEditing: Bool = false
@@ -31,7 +31,7 @@ struct MyProfileView: View {
                 navigationBar
 
                 EditableCircleProfileImage(
-                    viewModel: profileModel,
+                    viewModel: viewModel,
                     isEditable: isEditing
                 )
                 .padding(.top, 40)
@@ -39,7 +39,7 @@ struct MyProfileView: View {
                 // 이름
                 PrimaryTextField(
                     placeholder: "이름을 입력해주세요",
-                    text: $profileModel.name,
+                    text: $viewModel.name,
                     isDisabled: !isEditing
                 )
                 .padding(.top, 32)
@@ -47,7 +47,7 @@ struct MyProfileView: View {
                 // 이메일
                 PrimaryTextField(
                     placeholder: "이메일을 입력해주세요",
-                    text: $profileModel.email,
+                    text: $viewModel.email,
                     isDisabled: !isEditing
                 )
                 .padding(.top, 16)
@@ -58,8 +58,10 @@ struct MyProfileView: View {
                 PrimaryButton(
                     title: "완료",
                     action: {
-                        isEditing = false
-                        // TODO: UserDefaults / 서버 저장
+                        Task {
+                            await viewModel.saveProfile() // 서버에 POST(PUT) 요청
+                                isEditing = false
+                            }
                     },
                     destination: HomeView()
                 )
@@ -83,7 +85,7 @@ struct MyProfileView: View {
                         case .edit:
                             isEditing = true
                         case .delete:
-                            profileModel.deleteProfile()
+                            //profileModel.deleteProfile()
                             isEditing = false
                             dismiss()
                         }
@@ -130,4 +132,8 @@ struct MyProfileView: View {
         .padding(.top, 28.37)
         .padding(.bottom, 21)
     }
+}
+#Preview {
+    // 통합된 ProfileViewModel을 주입
+    MyProfileView(viewModel: ProfileViewModel())
 }

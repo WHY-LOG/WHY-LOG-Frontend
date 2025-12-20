@@ -13,21 +13,7 @@ import SwiftUI
 class ProfileModel: ObservableObject {
     @Published var name: String = ""
     @Published var email: String = ""
-    
-    var isProfileComplete: Bool{
-        !name.isEmpty && !email.isEmpty
-    }
-    
-    enum ImageState{
-        case empty
-        case loading(Progress)
-        case success(Image)
-        case failure(Error)
-    }
-    
     @Published private(set) var imageState: ImageState = .empty
-    
-    private var imageSelectionData: Data? = nil
     @Published var imageSelection: PhotosPickerItem?{
         didSet{
             if let imageSelection {
@@ -39,6 +25,20 @@ class ProfileModel: ObservableObject {
             }
         }
     }
+    
+    private var imageSelectionData: Data? = nil
+    
+    enum ImageState{
+        case empty
+        case loading(Progress)
+        case success(Image)
+        case failure(Error)
+    }
+    
+    
+    
+    
+    
     private func loadTransferable(from imageSelection: PhotosPickerItem) -> Progress {
         return imageSelection.loadTransferable(type: Data.self){ result in
             DispatchQueue.main.async {
