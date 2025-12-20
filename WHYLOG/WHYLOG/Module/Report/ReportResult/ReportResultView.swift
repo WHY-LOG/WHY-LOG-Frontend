@@ -12,6 +12,7 @@ struct ReportResultView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = ReportResultViewModel()
 
+
     @State private var writingText: String = ""
     
     
@@ -83,7 +84,12 @@ struct ReportResultView: View {
             }
         }
         .onAppear {
-            viewModel.loadMock(year: year)
+            Task {
+                await viewModel.load(
+                    userId: 1,   // ✅ 임시 userId
+                    year: year
+                )
+            }
         }
 
         .navigationBarBackButtonHidden(true)
