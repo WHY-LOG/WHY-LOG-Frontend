@@ -157,7 +157,7 @@ struct ReportResultView: View {
                 
             }
             .padding(.top, 30)
-            Text("\(viewModel.year) 판단 기준 리포트")
+            Text("\(String(viewModel.year)) 판단 기준 리포트")
                 .font(.PretendardBold20)
                 .foregroundStyle(.gray525252)
         }
@@ -175,9 +175,8 @@ struct ReportResultView: View {
     private var middleContent: some View {
         VStack (alignment: .leading) {
             
-            Text(viewModel.summaryText)
-                .font(.PretendardMedium16)
-                .foregroundStyle(.gray525252)
+            summaryView
+            
             
             Rectangle()
                 .foregroundStyle(.clear)
@@ -185,6 +184,7 @@ struct ReportResultView: View {
                 .background(.grayC5C5C5)
                 .padding(.top, 18)
                 .padding(.bottom, 21)
+            Spacer()
             
             Text("가장 반복된 판단 동기")
                 .font(.PretendardMedium16)
@@ -195,15 +195,15 @@ struct ReportResultView: View {
                 ForEach(viewModel.dominantTypes, id: \.self) { text in
                     ChipButton(text: text, state: .constant(.completed))
                 }
-
             }
-            
+            Spacer()
             Rectangle()
                 .foregroundStyle(.clear)
                 .frame(height: 0.88652)
                 .background(.grayC5C5C5)
                 .padding(.top, 30)
                 .padding(.bottom, 21)
+            
             
             Text("당신의 선택을 가장 많이 이끈 기준")
                 .font(.PretendardMedium16)
@@ -216,11 +216,32 @@ struct ReportResultView: View {
         }
     }
     
+    // MARK: - 요약 테스트
+    private var summaryView: some View {
+            VStack(alignment: .leading, spacing: 4) {
+
+                Text("\(String(viewModel.year))년 당신의 판단은")
+                    .font(.PretendardMedium12)
+
+                (
+                    Text(
+                        viewModel.summaryHighlights
+                            .map { "\($0.text)(\($0.percent)%)" }
+                            .joined(separator: "와 ")
+                    )
+                    .font(.PretendardSemiBold14)
+                )
+                Text("에서 시작되었습니다.")
+                    .font(.PretendardMedium12)
+            }
+            .foregroundStyle(.gray525252)
+        }
+    
     // MARK: - Writing
     private var writing: some View {
         VStack(alignment: .leading) {
             Text("리포트를 기반으로 앞으로의 다짐을 적어보아요.")
-                .font(.PretendardBold16)
+                .font(.PretendardMedium16)
                 .foregroundStyle(.gray525252)
                 .padding(.top, 17)
                 .padding(.bottom, 6)

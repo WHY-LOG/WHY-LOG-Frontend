@@ -122,7 +122,7 @@ struct ReportListView: View {
 //        }
 //    }
     private func reportListView(_ years: [Int]) -> some View {
-        ScrollView(.horizontal, showsIndicators: false) {
+        ScrollView(.vertical, showsIndicators: false) {
             HStack(spacing: 16) {
                 ForEach(years, id: \.self) { year in
                     NavigationLink {
