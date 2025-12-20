@@ -9,14 +9,25 @@ import Foundation
 
 struct NetworkClient {
 
-    static let baseURL = "https://YOUR_SERVER_URL"
+    static let baseURL = "http://152.70.239.43:3000"
 
     static func request<T: Decodable>(
         endpoint: APIEndpoint,
         body: Data? = nil
     ) async throws -> T {
 
-        let url = URL(string: baseURL + endpoint.path)!
+        var components = URLComponents(string: baseURL + endpoint.path)
+
+        if let queryParameters = endpoint.queryParameters {
+            components?.queryItems = queryParameters.map {
+                URLQueryItem(name: $0.key, value: "\($0.value)")
+            }
+        }
+
+        guard let url = components?.url else {
+            throw URLError(.badURL)
+        }
+
         var request = URLRequest(url: url)
         request.httpMethod = endpoint.method.rawValue
 
@@ -34,4 +45,5 @@ struct NetworkClient {
         return try JSONDecoder().decode(T.self, from: data)
     }
 }
+
 
