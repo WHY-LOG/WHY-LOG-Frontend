@@ -80,8 +80,8 @@ struct HomeView: View {
                     }
                 }
                 HStack{
-                    Image("swipe")
-                    Image("Swipe2")
+                    Image("swipe1")
+                    Image("swipe2")
                 }
                 Spacer()
                 ScrollView{
