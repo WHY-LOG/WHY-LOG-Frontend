@@ -35,15 +35,24 @@ struct NetworkClient {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.httpBody = body
 
+        print("🚀 Request URL: \(url)")
+        print("📦 Request Body: \(String(data: body ?? Data(), encoding: .utf8) ?? "")")
+
         let (data, response) = try await URLSession.shared.data(for: request)
 
-        guard let http = response as? HTTPURLResponse,
-              (200...299).contains(http.statusCode) else {
-            throw URLError(.badServerResponse)
+        if let httpResponse = response as? HTTPURLResponse {
+            print("✅ Status Code: \(httpResponse.statusCode)")
+            
+            guard let http = response as? HTTPURLResponse,
+                  (200...299).contains(http.statusCode) else {
+                throw URLError(.badServerResponse)
+            }
         }
 
         return try JSONDecoder().decode(T.self, from: data)
+        
+        }
     }
-}
+
 
 
