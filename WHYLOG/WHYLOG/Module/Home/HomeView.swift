@@ -19,11 +19,9 @@ struct HomeView: View {
     @State private var monthPage: Int = 0
     
     // 추가 1 관련: 필터링된 로그 계산
-    private var filteredLogs: [RecordCardModel] {
+    private var filteredLogs: [RecordDTO] { // [RecordCardModel]에서 변경
         mockLogs.filter { log in
-            // log의 날짜 정보가 selectedMonth와 일치하는지 확인 (MonthNumber 비교)
-            // 예: "3" == "3"
-            log.month == selectedMonth.MonthNumber
+            log.occurDate == selectedMonth.MonthNumber
         }
     }
 
@@ -149,7 +147,7 @@ extension HomeView {
     // 추가 3: 감정 칩 뷰
     private func emotionChipGroup(for type: SelectionType) -> some View {
         HStack(spacing: 8) {
-            // 예시 데이터: 실제로는 유형별 감정 배열을 매핑해야 합니다.
+            // 예시 데이터: 실제로는 유형별 감정 배열을 매핑해야함.
             let chips = ["회피", "두려움", "불안"]
             ForEach(chips, id: \.self) { text in
                 ChipButton(text: text, state: .constant(.completed))
@@ -166,12 +164,15 @@ extension HomeView {
                         .foregroundColor(.gray)
                         .padding(.top, 50)
                 } else {
-                    ForEach(filteredLogs) { record in
-                        RecordCard(recordCardModel: record)
-                    }
-                }
+                    // HomeView.swift 내의 ForEach 부분
+                    ForEach(filteredLogs) { log in
+                        NavigationLink(destination: DetailedRecordView(record: log)) {
+                            RecordCard(record: log)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }                }
             }
-            .padding(.bottom, 100) // addButton 공간 확보
+            .padding(.bottom, 100)
         }
     }
 }
