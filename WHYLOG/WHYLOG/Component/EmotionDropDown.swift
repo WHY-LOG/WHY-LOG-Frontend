@@ -10,7 +10,7 @@ import SwiftUI
 
 struct EmotionDropdown: View {
     @State private var isExpanded: Bool = false
-    @State private var selectedType: SelectionType = .두려움
+    @Binding var selectedType: SelectionType?
     
     var body: some View {
         // 1. 기준이 되는 버튼
@@ -53,7 +53,7 @@ struct EmotionDropdown: View {
             }
         }
         // 다른 뷰들보다 항상 위에 보이도록 설정
-        .zIndex(1)
+        .zIndex(10)
     }
     
     // 리스트의 각 행 (Row)
