@@ -47,7 +47,7 @@ struct ReportLoadingView: View {
     private func startLoading() {
         loadingTask = Task {
             // 나중에 여기서 createReport API 호출
-            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            try? await Task.sleep(nanoseconds: 2_500_000_000)
 
             if Task.isCancelled { return }
 
@@ -87,10 +87,9 @@ struct ReportLoadingView: View {
     // MARK: - Loading Message
     private var loadingMessage: some View {
         VStack {
-            Text("\(year)년 판단 리포트를\n만들고 있어요")
-                .font(.PretendardBold20)
+            Text(loadingText)
                 .multilineTextAlignment(.center)
-                .padding(.bottom, 12)
+                .padding(.vertical, 20)
 
             Text("잠시만 기다려주세요!")
                 .font(.PretendardMedium12)
@@ -116,6 +115,21 @@ struct ReportLoadingView: View {
         Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
             activeDotIndex = (activeDotIndex + 1) % dotCount
         }
+    }
+    
+    
+    // MARK: - Atrributed Text
+    private var loadingText: AttributedString {
+        var text = AttributedString("\(year)년 판단 리포트를\n만들고 있어요")
+        text.font = .PretendardBold20
+        text.foregroundColor = .gray525252
+            
+
+        if let range = text.range(of: "\(year)") {
+            text[range].foregroundColor = .accentCoral
+        }
+
+        return text
     }
 }
 
