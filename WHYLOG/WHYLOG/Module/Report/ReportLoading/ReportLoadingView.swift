@@ -124,4 +124,3 @@ struct ReportLoadingView: View {
 #Preview {
     ReportLoadingView(year: 2025)
 }
-

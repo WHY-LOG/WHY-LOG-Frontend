@@ -13,7 +13,7 @@ struct RecordCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 18){
             HStack(){
-                Text(recordCardModel.month)
+                Text(recordCardModel.month+"월")
                     .font(.PretendardBold20)
                     .foregroundColor(.gray525252)
                 Spacer()
