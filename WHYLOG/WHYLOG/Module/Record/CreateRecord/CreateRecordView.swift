@@ -38,20 +38,11 @@ struct CreateRecordView: View {
     
     var navi: some View {
         HStack {
-            Button {
-            } label: {
-                Image("arrow_back")
-                    .resizable()
-                    .foregroundStyle(.gray525252)
-                    .frame(width:10.41, height: 17.71)
-            }
             Spacer()
             Text("한 줄 기록")
                 .font(.PretendardBold16)
                 .foregroundStyle(.gray525252)
             Spacer()
-            
-
         }
         .padding(.top, 5)
         
@@ -117,7 +108,7 @@ struct CreateRecordView: View {
             }
             .scrollIndicators(.hidden)
             
-            PrimaryButton(title: "완료",action: {},destination: InitializeProfileView()) //도착 수정  -> 홈 뷰
+            PrimaryButton(title: "완료",action: {},destination: HomeView())
         }
     }
 }
