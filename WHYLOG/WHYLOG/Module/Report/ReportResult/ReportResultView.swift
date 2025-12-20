@@ -10,8 +10,8 @@ import SwiftUI
 
 struct ReportResultView: View {
     @Environment(\.dismiss) private var dismiss
-    
-    let savedEmotions = ["두려움", "회피"]
+    @StateObject private var viewModel = ReportResultViewModel()
+
     @State private var writingText: String = ""
     @StateObject private var graphVM = EmotionGraphViewModel()
     
@@ -77,7 +77,7 @@ struct ReportResultView: View {
                 // 수정 화면 (예: 리포트 수정 화면)
                 ReportResultView(year: 2025)
             }
-
+            
             .navigationDestination(isPresented: $navigateToHome) {
                 CreateRecordView()
             }
@@ -85,6 +85,7 @@ struct ReportResultView: View {
         
         .navigationBarBackButtonHidden(true)
     }
+
     
     
     
@@ -129,9 +130,12 @@ struct ReportResultView: View {
     private var topContent: some View {
         VStack (alignment: .leading){
             HStack {
-                Text("2025 판단 기준 리포트")
-                    .font(.PretendardBold16)
-                    .foregroundStyle(.gray525252)
+                if let year = viewModel.report?.year {
+                    Text("\(year) 판단 기준 리포트")
+                        .font(.PretendardBold16)
+                        .foregroundStyle(.gray525252)
+                }
+
                 Spacer()
                 
                 // 수정/삭제 버튼 컴포넌트
@@ -147,7 +151,7 @@ struct ReportResultView: View {
                 )
                 
             }
-            Text("ㅇㅇㅇ님은 회피주의자 유형이에요.")
+            Text("ㅇㅇㅇ님은 \(viewModel.dominantTypes.joined(separator: ", ")) 유형이에요.")
                 .font(.PretendardBold16)
                 .foregroundStyle(.gray525252)
                 .padding(.bottom, 17)
@@ -157,7 +161,20 @@ struct ReportResultView: View {
     
     // MARK: - Graph Box
     private var graphBox: some View {
-        EmotionGraphView(items: graphVM.items)
+        EmotionGraphView(
+            items: viewModel.report?.graphData.compactMap { data in
+                if let type = EmotionType(rawValue: data.categoryName) {
+                    return EmotionGraphItem(
+                        type: type,
+                        ratio: CGFloat(data.percent) / 100
+                    )
+                } else {
+                    return nil
+                }
+            } ?? []
+        )
+
+
             .frame(height: 164.9)
             .padding(.bottom, 14.8)
             .onAppear {
@@ -170,7 +187,7 @@ struct ReportResultView: View {
     private var middleContent: some View {
         VStack (alignment: .leading) {
             
-            Text("2025년 당신의 판단은 \n회피(52%)와 두려움(19%)에서 시작되었습니다.")
+            Text(viewModel.summaryText)
                 .font(.PretendardMedium12)
                 .foregroundStyle(.gray525252)
             
@@ -187,9 +204,10 @@ struct ReportResultView: View {
                 .padding(.bottom, 11.6)
             // Selected Chip
             HStack {
-                ForEach (savedEmotions, id: \.self) { text in
-                    ChipButton(text: text, state:  .constant(.completed))
+                ForEach(viewModel.dominantTypes, id: \.self) { text in
+                    ChipButton(text: text, state: .constant(.completed))
                 }
+
             }
             
             Rectangle()
@@ -204,7 +222,7 @@ struct ReportResultView: View {
                 .foregroundStyle(.gray525252)
                 .padding(.bottom, 8.48)
             
-            Text("2025년 당신의 판단은 \n회피(52%)와 두려움(19%)에서 시작되었습니다.")
+            Text(viewModel.standardText)
                 .font(.PretendardMedium12)
                 .foregroundStyle(.gray525252)
         }

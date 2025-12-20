@@ -40,4 +40,26 @@ final class ReportResultViewModel: ObservableObject {
             .filter { $0.percent == maxPercent }
             .map { $0.categoryName }
     }
+    
+    // MARK: - Summary Text
+    var summaryText: String {
+        guard let report = report else { return "" }
+
+        let topTwo = report.graphData
+            .sorted { $0.percent > $1.percent }
+            .prefix(2)
+
+        let text = topTwo
+            .map { "\($0.categoryName)(\($0.percent)%)" }
+            .joined(separator: "와 ")
+
+        return "\(report.year)년 당신의 판단은\n\(text)에서 시작되었습니다."
+    }
+
+    // MARK: - AI 답변
+    var standardText: String {
+        report?.standard ?? ""
+    }
 }
+
+
