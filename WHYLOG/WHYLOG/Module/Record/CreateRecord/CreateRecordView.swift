@@ -11,6 +11,8 @@ import SwiftUI
 struct CreateRecordView: View {
     @StateObject private var viewModel = CreateRecordViewModel()
     
+    @Environment(\.dismiss) var dismiss
+    
     var body: some View {
         NavigationStack{
             ZStack{
@@ -26,6 +28,11 @@ struct CreateRecordView: View {
                 .padding(.bottom, 20)
             }
         }
+        .onChange(of: viewModel.isSuccess) { oldValue, newValue in
+            if newValue {
+                dismiss()
+            }
+        }
     }
     
     // MARK: - top
@@ -38,20 +45,11 @@ struct CreateRecordView: View {
     
     var navi: some View {
         HStack {
-            Button {
-            } label: {
-                Image("arrow_back")
-                    .resizable()
-                    .foregroundStyle(.gray525252)
-                    .frame(width:10.41, height: 17.71)
-            }
             Spacer()
             Text("한 줄 기록")
                 .font(.PretendardBold16)
                 .foregroundStyle(.gray525252)
             Spacer()
-            
-
         }
         .padding(.top, 5)
         
@@ -66,43 +64,43 @@ struct CreateRecordView: View {
     
     var monthselect: some View {
         VStack(spacing: 8) {
-                MonthSelectButton(
-                    title: viewModel.selectedMonth,
-                    isSelected: viewModel.isDateSelected,
-                    action: {
-                        withAnimation(.spring()) {
-                            viewModel.showMonthGraph.toggle()
+            MonthSelectButton(
+                title: viewModel.selectedMonth,
+                isSelected: viewModel.isDateSelected,
+                action: {
+                    withAnimation(.spring()) {
+                        viewModel.showMonthGraph.toggle()
+                    }
+                }
+            )
+            
+            if viewModel.showMonthGraph {
+                MonthGraph(selectedMonth: $viewModel.selectedMonth)
+                    .onChange(of: viewModel.selectedMonth) { oldValue, newValue in
+                        withAnimation {
+                            viewModel.showMonthGraph = false
                         }
                     }
-                )
-                
-                if viewModel.showMonthGraph {
-                    MonthGraph(selectedMonth: $viewModel.selectedMonth)
-                        .onChange(of: viewModel.selectedMonth) { oldValue, newValue in
-                            withAnimation {
-                                viewModel.showMonthGraph = false
-                            }
-                        }
-                        .transition(.opacity.combined(with: .move(edge: .top)))
-                }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
             }
+        }
     }
     
     // MARK: - middle
     var middle: some View {
         VStack(alignment: .leading, spacing: 20) {
-                WriteCard(
-                    title: "어떤 일을 했었나요?",
-                    text: $viewModel.whatHappened,
-                    height: 60
-                )
+            WriteCard(
+                title: "어떤 일을 했었나요?",
+                text: $viewModel.whatHappened,
+                height: 60
+            )
             
-                WriteCard(
-                    title: "그렇게 행동한 이유를 입력해주세요.",
-                    text: $viewModel.whyAction,
-                    height: 224
-                )
-            }
+            WriteCard(
+                title: "그렇게 행동한 이유를 입력해주세요.",
+                text: $viewModel.whyAction,
+                height: 224
+            )
+        }
     }
     
     // MARK: - bottom
@@ -117,7 +115,18 @@ struct CreateRecordView: View {
             }
             .scrollIndicators(.hidden)
             
-            PrimaryButton(title: "완료",action: {},destination: InitializeProfileView()) //도착 수정  -> 홈 뷰
+            Button(action: {
+                // API 전송 함수 호출
+                viewModel.uploadRecord()
+            }) {
+                Text("완료")
+                    .foregroundColor(.white)
+                    .font(.PretendardBold16)
+                    .padding(.vertical, 18)
+            }
+            .modifier(PrimaryButtonStyle(backgroundColor: .accentCoral, textColor: .white))
+            .disabled(viewModel.isLoading)
+            .opacity(viewModel.isLoading ? 0.6 : 1.0)
         }
     }
 }
