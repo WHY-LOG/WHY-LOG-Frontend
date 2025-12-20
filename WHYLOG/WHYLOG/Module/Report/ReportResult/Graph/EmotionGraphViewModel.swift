@@ -33,7 +33,7 @@ final class EmotionGraphViewModel: ObservableObject {
         }
     }
 
-    // 🔮 나중에 API 붙일 때 예시
+    // 나중에 API 붙일 때 예시
     /*
     func loadFromAPI(data: [GraphData]) {
         items = data.map {
