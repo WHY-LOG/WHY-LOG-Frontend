@@ -86,7 +86,7 @@ struct ReportResultView: View {
         .onAppear {
             Task {
                 await viewModel.load(
-                    userId: 1,   // ✅ 임시 userId
+                    userId: 1,   // TODO: 로그인 연동 후 실제 userId로 교체
                     year: year
                 )
             }
