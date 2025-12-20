@@ -5,29 +5,25 @@
 //  Created by 김진서 on 12/19/25.
 //
 
-import SwiftUI
+import Foundation
 import Combine
 
 @MainActor
 final class ReportListViewModel: ObservableObject {
-    @Published var state: ReportListState = .empty
 
-    func fetchReports() async {
+    /// 생성된 리포트 연도 목록
+    @Published var years: [Int] = []
 
-        do {
-            // 나중에 실제 API 호출
-            try await Task.sleep(nanoseconds: 1_000_000_000)
-
-            let reports: [Int] = [] // 예: API 결과
-
-            if reports.isEmpty {
-                state = .empty
-            } else {
-                state = .loaded(reports)
-            }
-
-        } catch {
-            state = .networkError
-        }
+    // MARK: - Mock
+    func loadMock() {
+        years = [2025]
     }
+
+    // MARK: - API (나중에)
+    /*
+    func fetchReports(userId: Int) async throws {
+        let response = try await reportService.fetchReports(userId: userId)
+        years = response.map { $0.year }
+    }
+    */
 }

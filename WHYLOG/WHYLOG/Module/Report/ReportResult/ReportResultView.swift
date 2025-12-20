@@ -13,7 +13,7 @@ struct ReportResultView: View {
     @StateObject private var viewModel = ReportResultViewModel()
 
     @State private var writingText: String = ""
-    @StateObject private var graphVM = EmotionGraphViewModel()
+    
     
     @State private var showAlert = false
     @State private var alertType: AlertType = .edit
@@ -82,9 +82,14 @@ struct ReportResultView: View {
                 CreateRecordView()
             }
         }
-        
+        .onAppear {
+            viewModel.loadMock(year: year)
+        }
+
         .navigationBarBackButtonHidden(true)
     }
+        
+
 
     
     
@@ -130,11 +135,11 @@ struct ReportResultView: View {
     private var topContent: some View {
         VStack (alignment: .leading){
             HStack {
-                if let year = viewModel.report?.year {
-                    Text("\(year) 판단 기준 리포트")
-                        .font(.PretendardBold16)
-                        .foregroundStyle(.gray525252)
-                }
+                
+                Image("WHYLOGLogo")
+                    .resizable()
+                    .frame(width: 92,height: 22)
+                    
 
                 Spacer()
                 
@@ -151,35 +156,18 @@ struct ReportResultView: View {
                 )
                 
             }
-            Text("ㅇㅇㅇ님은 \(viewModel.dominantTypes.joined(separator: ", ")) 유형이에요.")
-                .font(.PretendardBold16)
+            .padding(.top, 30)
+            Text("\(String(viewModel.year)) 판단 기준 리포트")
+                .font(.PretendardBold20)
                 .foregroundStyle(.gray525252)
-                .padding(.bottom, 17)
-                .padding(.top, 31)
         }
     }
     
     // MARK: - Graph Box
     private var graphBox: some View {
-        EmotionGraphView(
-            items: viewModel.report?.graphData.compactMap { data in
-                if let type = EmotionType(rawValue: data.categoryName) {
-                    return EmotionGraphItem(
-                        type: type,
-                        ratio: CGFloat(data.percent) / 100
-                    )
-                } else {
-                    return nil
-                }
-            } ?? []
-        )
-
-
+        EmotionGraphView(items: viewModel.graphItems)
             .frame(height: 164.9)
-            .padding(.bottom, 14.8)
-            .onAppear {
-                graphVM.loadMock()
-            }
+            .padding(.vertical, 40)
     }
 
     
@@ -187,9 +175,8 @@ struct ReportResultView: View {
     private var middleContent: some View {
         VStack (alignment: .leading) {
             
-            Text(viewModel.summaryText)
-                .font(.PretendardMedium12)
-                .foregroundStyle(.gray525252)
+            summaryView
+            
             
             Rectangle()
                 .foregroundStyle(.clear)
@@ -197,9 +184,10 @@ struct ReportResultView: View {
                 .background(.grayC5C5C5)
                 .padding(.top, 18)
                 .padding(.bottom, 21)
+            Spacer()
             
             Text("가장 반복된 판단 동기")
-                .font(.PretendardBold16)
+                .font(.PretendardMedium16)
                 .foregroundStyle(.gray525252)
                 .padding(.bottom, 11.6)
             // Selected Chip
@@ -207,9 +195,8 @@ struct ReportResultView: View {
                 ForEach(viewModel.dominantTypes, id: \.self) { text in
                     ChipButton(text: text, state: .constant(.completed))
                 }
-
             }
-            
+            Spacer()
             Rectangle()
                 .foregroundStyle(.clear)
                 .frame(height: 0.88652)
@@ -217,8 +204,9 @@ struct ReportResultView: View {
                 .padding(.top, 30)
                 .padding(.bottom, 21)
             
+            
             Text("당신의 선택을 가장 많이 이끈 기준")
-                .font(.PretendardBold16)
+                .font(.PretendardMedium16)
                 .foregroundStyle(.gray525252)
                 .padding(.bottom, 8.48)
             
@@ -228,11 +216,32 @@ struct ReportResultView: View {
         }
     }
     
+    // MARK: - 요약 테스트
+    private var summaryView: some View {
+            VStack(alignment: .leading, spacing: 4) {
+
+                Text("\(String(viewModel.year))년 당신의 판단은")
+                    .font(.PretendardMedium12)
+
+                (
+                    Text(
+                        viewModel.summaryHighlights
+                            .map { "\($0.text)(\($0.percent)%)" }
+                            .joined(separator: "와 ")
+                    )
+                    .font(.PretendardSemiBold14)
+                )
+                Text("에서 시작되었습니다.")
+                    .font(.PretendardMedium12)
+            }
+            .foregroundStyle(.gray525252)
+        }
+    
     // MARK: - Writing
     private var writing: some View {
         VStack(alignment: .leading) {
             Text("리포트를 기반으로 앞으로의 다짐을 적어보아요.")
-                .font(.PretendardBold16)
+                .font(.PretendardMedium16)
                 .foregroundStyle(.gray525252)
                 .padding(.top, 17)
                 .padding(.bottom, 6)
