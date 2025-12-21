@@ -51,20 +51,26 @@ struct ReportResultView: View {
                 // 완료 버튼 (레이아웃 무관)
                 VStack {
                     Spacer()
+
                     PrimaryButton(
                         title: "완료",
                         action: {
                             Task {
-                                try? await viewModel.updateContent(
-                                    userId: 5,
-                                    content: writingText
-                                )
+                                do {
+                                    try await viewModel.updateContent(
+                                        userId: 5,
+                                        content: writingText
+                                    )
+                                } catch {
+                                    print("❌ 수정 실패:", error)
+                                }
                             }
                         },
-                        destination: HomeView()
+                        destination: ReportListView()
                     )
-                    .padding(.horizontal, 20)
                 }
+
+
                 
                 if showAlert {
                     CustomAlert(
@@ -96,12 +102,12 @@ struct ReportResultView: View {
             }
         }
         .onAppear {
-            viewModel.reportId = reportId   // ⭐️ 핵심
-            
-            if mode == .readOnly {
-                Task {
-                    await viewModel.load(userId: 5, year: year)
-                }
+            viewModel.reportId = reportId
+
+            Task {
+                await viewModel.load(userId: 5, year: year)
+                
+                writingText = viewModel.content
             }
 
             if mode == .create {

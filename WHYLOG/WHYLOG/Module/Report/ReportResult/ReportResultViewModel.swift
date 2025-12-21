@@ -11,11 +11,12 @@ import CoreGraphics
 
 @MainActor
 final class ReportResultViewModel: ObservableObject {
-    
+
     private let reportService = ReportService()
     @Published var year: Int = 0
     @Published var reportId: Int = 0
-    
+    @Published var content: String = ""
+
     // MARK: - View State (View가 직접 쓰는 값)
     /// 가장 많이 반복된 판단 동기 (ex. ["회피", "책임감"])
     @Published var dominantTypes: [String] = []
@@ -45,13 +46,15 @@ final class ReportResultViewModel: ObservableObject {
     
     private func apply(_ result: ReportResultDTO) {
         // reportId
-        self.reportId = result.reportId
+        self.reportId = result.reportId!
         
         // 연도
         self.year = result.year
 
         // AI 기준 텍스트
         self.standardText = result.standard
+        
+        self.content = result.content
 
         // 퍼센트 기준 정렬
         let sorted = result.graphData.sorted { $0.percent > $1.percent }
@@ -80,6 +83,7 @@ final class ReportResultViewModel: ObservableObject {
 
 
         self.graphItems = makeGraphItems(counts: counts)
+        
     }
 
 

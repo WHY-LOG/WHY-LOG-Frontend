@@ -14,9 +14,9 @@ struct ReportListItemDTO: Decodable {
     let year: Int
 }
 
-// MARK: - Report Result (리포트 결과 상세)
+// MARK: - Report Result (GET 결과 조회용)
 struct ReportResultDTO: Decodable {
-    let reportId: Int
+    let reportId: Int?
     let year: Int
     let standard: String
     let content: String
@@ -30,15 +30,21 @@ struct GraphDataDTO: Decodable {
     let percent: Int
 }
 
-// MARK: - Create Report Request
+// MARK: - Create Report Response (POST 전용 DTO)
+struct CreateReportResultDTO: Decodable {
+    let year: Int
+    let standard: String
+    let graphData: [GraphDataDTO]
+}
+
+struct CreateReportResponse: Decodable {
+    let result: CreateReportResultDTO
+}
+
+// MARK: - Create Report Request (POST Body)
 struct CreateReportRequest: Encodable {
     let year: Int
 }
-
-struct ReportResultResponse: Decodable {
-    let result: ReportResultDTO
-}
-
 
 // MARK: - Update Report Request
 struct UpdateReportRequest: Encodable {

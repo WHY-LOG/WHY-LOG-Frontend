@@ -12,37 +12,35 @@ final class ReportService {
 
     // MARK: - 리포트 목록 조회
     func fetchReports(userId: Int) async throws -> [ReportListItemDTO] {
+        do {
+            struct Response: Decodable {
+                let result: [ReportListItemDTO]
+            }
 
-        struct FetchReportsResponse: Decodable {
-            let result: [ReportListItemDTO]
+            let response: Response = try await NetworkClient.request(
+                endpoint: .fetchReports(userId: userId)
+            )
+            return response.result
+
+        } catch {
+            // R004 → 리포트 없음
+            return []
         }
-
-        let response: FetchReportsResponse = try await NetworkClient.request(
-            endpoint: .fetchReports(userId: userId)
-        )
-
-        return response.result
     }
 
 
-    // MARK: - 리포트 생성
-    func createReport(userId: Int, year: Int) async throws -> ReportResultDTO {
-        struct Response: Decodable {
-            let result: ReportResultDTO
-        }
 
+    // MARK: - 리포트 생성
+    func createReport(userId: Int, year: Int) async throws {
         let bodyData = try JSONEncoder().encode(
             CreateReportRequest(year: year)
         )
 
-        let response: Response = try await NetworkClient.request(
+        _ = try await NetworkClient.request(
             endpoint: .createReport(userId: userId),
             body: bodyData
-        )
-
-        return response.result
+        ) as CreateReportResponse
     }
-
 
 
     // MARK: - 리포트 결과 조회

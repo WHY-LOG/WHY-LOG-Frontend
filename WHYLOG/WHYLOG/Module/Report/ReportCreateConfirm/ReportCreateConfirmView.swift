@@ -1,11 +1,3 @@
-////
-////  ReportCreateConfirmView.swift
-////  WHYLOG
-////
-////  Created by 김진서 on 12/18/25.
-////
-//
-
 import SwiftUI
 
 struct ReportCreateConfirmView: View {
@@ -28,7 +20,7 @@ struct ReportCreateConfirmView: View {
                     title: "완료",
                     action: {},
                     destination: ReportLoadingView(
-                        userId: 1,   // TODO: 실제 로그인 유저 ID로 교체
+                        userId: 5,
                         year: year
                     )
                 )
@@ -78,4 +70,3 @@ struct ReportCreateConfirmView: View {
         ReportCreateConfirmView(year: 2025)
     }
 }
-

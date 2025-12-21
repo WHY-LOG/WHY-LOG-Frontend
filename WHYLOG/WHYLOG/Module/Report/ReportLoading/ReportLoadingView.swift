@@ -74,28 +74,37 @@ struct ReportLoadingView: View {
     private func startLoading() {
         loadingTask = Task {
             do {
-                let result = try await reportService.createReport(
+                // 1️⃣ 생성 시도
+                _ = try await reportService.createReport(
                     userId: userId,
                     year: year
                 )
 
-                // UX용 딜레이
-                try await Task.sleep(nanoseconds: 2_000_000_000)
+                // 2️⃣ 생성 성공 여부와 상관없이
+                //    목록을 다시 불러서 reportId 확보
+                let reports = try await reportService.fetchReports(userId: userId)
 
-                if Task.isCancelled { return }
+                if let report = reports.first(where: { $0.year == year }) {
+                    await MainActor.run {
+                        createdReportId = report.reportId
+                    }
+                    return
+                }
 
+                // 3️⃣ 여기까지 왔으면 진짜 이상한 상황
                 await MainActor.run {
-                    createdReportId = result.reportId
+                    showErrorAlert = true
                 }
 
             } catch {
-                print("❌ 리포트 생성 실패:", error)
+                print("❌ 리포트 생성/이동 실패:", error)
                 await MainActor.run {
                     showErrorAlert = true
                 }
             }
         }
     }
+
 
     // MARK: - Navigation Bar
     private var navigationBar: some View {
