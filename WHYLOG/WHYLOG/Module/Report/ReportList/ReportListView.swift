@@ -18,28 +18,31 @@ struct ReportListView: View {
             
             VStack {
                 navigationBar
+                
                 contentView
                 addButton
+
             }
             .padding(.horizontal, 20)
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
             Task {
-                await viewModel.load(userId: 1) // 임시 userId
+                await viewModel.load(userId: 5) // 임시 userId
             }
         }
     }
     // MARK: - Content View
     private var contentView: some View {
         Group {
-            if viewModel.years.isEmpty {
+            if viewModel.reports.isEmpty {
                 emptyStateView
             } else {
-                reportListView(viewModel.years)
+                reportListView(viewModel.reports)
             }
         }
     }
+
     
     // MARK: - Report List
     
@@ -48,16 +51,21 @@ struct ReportListView: View {
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
-    private func reportListView(_ years: [Int]) -> some View {
+    
+    private func reportListView(_ reports: [ReportListItemDTO]) -> some View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(years, id: \.self) { year in
+                ForEach(reports, id: \.reportId) { report in
                     NavigationLink {
-                        ReportResultView(year: year)
+                        ReportResultView(
+                            reportId: report.reportId,
+                            year: report.year,
+                            mode: .readOnly
+                        )
                     } label: {
                         YearReportCard(
-                            year: year,
-                            selectedYear: year
+                            year: report.year,
+                            selectedYear: report.year
                         )
                     }
                 }
@@ -65,6 +73,8 @@ struct ReportListView: View {
             .padding(.top, 40)
         }
     }
+
+
     
     
     // MARK: - Navigation Bar
@@ -78,7 +88,7 @@ struct ReportListView: View {
             }
             
             HStack {
-                Button { dismiss() } label: {
+                NavigationLink { HomeView() } label: {
                     Image("arrow_back")
                         .resizable()
                         .frame(width: 10, height: 18)
@@ -104,12 +114,15 @@ struct ReportListView: View {
             
             Text("아직 생성된 리포트가 없습니다")
                 .font(.PretendardBold20)
+                .foregroundStyle(.gray525252)
+                .padding(.top, 34)
+                .padding(.bottom, 16)
             
             Text("회고를 바탕으로\n나만의 리포트를 만들어보세요")
                 .font(.PretendardMedium12)
                 .multilineTextAlignment(.center)
+                .foregroundStyle(.gray525252)
             
-            Spacer()
         }
     }
     
