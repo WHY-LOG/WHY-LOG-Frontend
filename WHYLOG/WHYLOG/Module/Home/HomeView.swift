@@ -80,7 +80,7 @@ extension HomeView {
             Image("WHYLOGLogo").resizable().frame(width: 97, height: 25)
             EmotionDropdown(selectedType: $selectedEmotionType)
             Spacer()
-            NavigationLink(destination: EmptyView()) {
+            NavigationLink(destination: ReportListView()) {
                 Image(systemName: "text.document").resizable().scaledToFit().frame(width: 24, height: 24).foregroundColor(.gray525252)
             }
             NavigationLink(destination: MyProfileView(viewModel: profileViewModel)) {

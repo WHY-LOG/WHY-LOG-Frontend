@@ -88,7 +88,7 @@ struct ReportListView: View {
             }
             
             HStack {
-                NavigationLink { HomeView() } label: {
+                Button{ dismiss() } label: {
                     Image("arrow_back")
                         .resizable()
                         .frame(width: 10, height: 18)
