@@ -121,8 +121,8 @@ struct ReportResultView: View {
     private var navigationBar: some View {
         // Navigation Bar
         HStack(alignment: .top) {
-            Button {
-                dismiss() //TODO: HomeView
+            NavigationLink {
+                HomeView()
             } label: {
                 Image("arrow_back")
                     .resizable()
@@ -163,6 +163,7 @@ struct ReportResultView: View {
                         withAnimation { showAlert = true }
                     }
                 )
+                .padding(.horizontal, 10)
                 
             }
             .padding(.top, 30)
@@ -282,13 +283,14 @@ struct ReportResultView: View {
                     .disabled(!isEditing)
             }
         }
+        .padding(.bottom, 120)
     }
     
 }
 
-//#Preview {
-//    NavigationStack {
-//        ReportResultView(year: 2025, mode: .readOnly)
-//            .environmentObject(ReportStore())
-//    }
-//}
+#Preview {
+    NavigationStack {
+        ReportResultView(reportId: 5, year: 2025, mode: .readOnly)
+            .environmentObject(ReportStore())
+    }
+}
