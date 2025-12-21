@@ -7,10 +7,11 @@
 
 import SwiftUI
 import PhotosUI
+import Combine
 
 struct MyProfileView: View {
 
-    @StateObject var viewModel: ProfileViewModel
+    @ObservedObject var viewModel: ProfileViewModel
     @Environment(\.dismiss) private var dismiss
 
     @State private var isEditing: Bool = false
@@ -59,7 +60,7 @@ struct MyProfileView: View {
                     title: "완료",
                     action: {
                         Task {
-                            await viewModel.saveProfile() // 서버에 POST(PUT) 요청
+                            await viewModel.updateProfile() // 서버에 POST(PUT) 요청
                                 isEditing = false
                             }
                     },
@@ -74,28 +75,38 @@ struct MyProfileView: View {
             // 삭제 / 수정 Alert
             if showAlert {
                 CustomAlert(
-                    title: alertType == .edit
-                        ? "수정하시겠습니까?"
-                        : "삭제하시겠습니까?",
-                    message: alertType == .delete
-                        ? "삭제 시 해당 내용이 모두 사라집니다."
-                        : nil,
+                    title: alertType == .edit ? "수정하시겠습니까?" : "삭제하시겠습니까?",
+                    message: alertType == .delete ? "삭제 시 해당 내용이 모두 사라집니다." : nil,
                     action: {
-                        switch alertType {
-                        case .edit:
-                            isEditing = true
-                        case .delete:
-                            //profileModel.deleteProfile()
-                            isEditing = false
-                            dismiss()
+                        // ✅ 비동기 함수 호출을 위해 Task 블록 사용
+                        Task {
+                            switch alertType {
+                            case .edit:
+                                isEditing = true
+                                showAlert = false // 수정 모드 진입 시 알럿 닫기
+                                
+                            case .delete:
+                                // ✅ await를 사용하여 삭제 완료까지 기다림
+                                let success = await viewModel.deleteProfile()
+                                
+                                if success {
+                                    isEditing = true
+                                    showAlert = false
+                                    dismiss() // ✅ 삭제 성공 시에만 화면 이탈
+                                } else {
+                                    // 실패 처리 (필요시 에러 알럿 등을 띄울 수 있음)
+                                    showAlert = false
+                                }
+                            }
                         }
-                        showAlert = false
                     },
                     cancelAction: {
                         showAlert = false
                     }
                 )
             }
+        }.task {
+            await viewModel.fetchProfile()
         }
     }
 
