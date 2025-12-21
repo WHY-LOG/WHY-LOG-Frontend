@@ -13,11 +13,10 @@ import CoreGraphics
 final class ReportResultViewModel: ObservableObject {
     
     private let reportService = ReportService()
-    
+    @Published var year: Int = 0
+    @Published var reportId: Int = 0
     
     // MARK: - View State (View가 직접 쓰는 값)
-    @Published var year: Int = 0
-    
     /// 가장 많이 반복된 판단 동기 (ex. ["회피", "책임감"])
     @Published var dominantTypes: [String] = []
     
@@ -30,10 +29,6 @@ final class ReportResultViewModel: ObservableObject {
     
     /// 그래프용 데이터 (항상 6개)
     @Published var graphItems: [EmotionGraphItem] = []
-    
-    
-    
-    
     
     /*
      // MARK: - Mock (API 연동 전)
@@ -143,7 +138,6 @@ final class ReportResultViewModel: ObservableObject {
     }
     
     // MARK: - 다짐 내용 저장
-    @Published var reportId: Int = 0
     func updateContent(
         userId: Int,
         content: String
@@ -154,5 +148,13 @@ final class ReportResultViewModel: ObservableObject {
             content: content
         )
     }
+    
+    // MARK: - 리포트 삭제
+        func deleteReport(userId: Int) async throws {
+            try await reportService.deleteReport(
+                userId: userId,
+                reportId: reportId
+            )
+        }
 
 }

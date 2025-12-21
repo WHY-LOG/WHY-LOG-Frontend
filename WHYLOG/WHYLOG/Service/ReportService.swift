@@ -92,6 +92,23 @@ final class ReportService {
         ) as Response
     }
 
+    // MARK: - 리포트 삭제 (DELETE)
+    func deleteReport(
+        userId: Int,
+        reportId: Int
+    ) async throws {
+
+        struct Response: Decodable {
+            let result: String? // 서버 스펙에 따라 Void여도 OK
+        }
+
+        _ = try await NetworkClient.request(
+            endpoint: .deleteReport(
+                userId: userId,
+                reportId: reportId
+            )
+        ) as Response
+    }
 
 
 }

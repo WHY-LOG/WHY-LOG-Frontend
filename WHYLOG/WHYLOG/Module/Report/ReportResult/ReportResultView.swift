@@ -29,8 +29,6 @@ struct ReportResultView: View {
     
     @State private var showAlert = false
     @State private var alertType: AlertType = .edit
-    @State private var navigateToEdit = false
-    @State private var navigateToHome = false
     
     
     
@@ -81,10 +79,17 @@ struct ReportResultView: View {
                         action: {
                             if alertType == .edit {
                                 isEditing = true
+                                showAlert = false
                             } else {
-                                navigateToHome = true // TODO: 삭제 후 리스트로 이동으로 변경 필요
+                                Task {
+                                    do {
+                                        try await viewModel.deleteReport(userId: 1)
+                                        dismiss()   // ReportListView로 복귀
+                                    } catch {
+                                        print("❌ 리포트 삭제 실패:", error)
+                                    }
+                                }
                             }
-                            showAlert = false
                         },
                         cancelAction: {
                             showAlert = false
