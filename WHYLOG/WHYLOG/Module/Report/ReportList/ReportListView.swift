@@ -18,8 +18,10 @@ struct ReportListView: View {
             
             VStack {
                 navigationBar
+                
                 contentView
                 addButton
+
             }
             .padding(.horizontal, 20)
         }
@@ -104,12 +106,15 @@ struct ReportListView: View {
             
             Text("아직 생성된 리포트가 없습니다")
                 .font(.PretendardBold20)
+                .foregroundStyle(.gray525252)
+                .padding(.top, 34)
+                .padding(.bottom, 16)
             
             Text("회고를 바탕으로\n나만의 리포트를 만들어보세요")
                 .font(.PretendardMedium12)
                 .multilineTextAlignment(.center)
+                .foregroundStyle(.gray525252)
             
-            Spacer()
         }
     }
     

@@ -66,5 +66,32 @@ final class ReportService {
 
         return report
     }
+    
+    // MARK: - 리포트 수정 (PUT)
+    func updateReport(
+        userId: Int,
+        reportId: Int,
+        content: String
+    ) async throws {
+
+        struct Request: Encodable {
+            let content: String
+        }
+
+        let body = try JSONEncoder().encode(
+            Request(content: content)
+        )
+
+        struct Response: Decodable {
+            let result: ReportResultDTO
+        }
+
+        _ = try await NetworkClient.request(
+            endpoint: .updateReport(userId: userId, reportId: reportId),
+            body: body
+        ) as Response
+    }
+
+
 
 }

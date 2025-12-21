@@ -50,8 +50,19 @@ struct ReportResultView: View {
                 // 완료 버튼 (레이아웃 무관)
                 VStack {
                     Spacer()
-                    confirmButton
-                        .padding(.horizontal, 20)
+                    PrimaryButton(
+                        title: "완료",
+                        action: {
+                            Task {
+                                try? await viewModel.updateContent(
+                                    userId: 3,
+                                    content: writingText
+                                )
+                            }
+                        },
+                        destination: HomeView()
+                    )
+                    .padding(.horizontal, 20)
                 }
                 
                 if showAlert {
@@ -122,20 +133,20 @@ struct ReportResultView: View {
         .padding(.bottom, 21)
     }
     
-    // MARK: - Confirm Button
-    private var confirmButton: some View {
-        NavigationLink {
-            HomeView() // 이동할 뷰 선택
-        } label: {
-            Text("완료")
-                .foregroundStyle(.white)
-                .font(.PretendardBold16)
-                .padding(.vertical,18)
-                .frame(maxWidth:.infinity)
-                .background(Color.accentCoral)
-                .cornerRadius(18)
-        }
-    }
+//    // MARK: - Confirm Button
+//    private var confirmButton: some View {
+//        NavigationLink {
+//            HomeView() // 이동할 뷰 선택
+//        } label: {
+//            Text("완료")
+//                .foregroundStyle(.white)
+//                .font(.PretendardBold16)
+//                .padding(.vertical,18)
+//                .frame(maxWidth:.infinity)
+//                .background(Color.accentCoral)
+//                .cornerRadius(18)
+//        }
+//    }
     
     // MARK: - Top Content
     private var topContent: some View {

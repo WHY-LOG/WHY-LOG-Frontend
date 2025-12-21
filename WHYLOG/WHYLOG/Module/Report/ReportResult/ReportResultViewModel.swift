@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import CoreGraphics
 
 @MainActor
 final class ReportResultViewModel: ObservableObject {
@@ -84,6 +85,9 @@ final class ReportResultViewModel: ObservableObject {
 //    }
     
     private func apply(_ result: ReportResultDTO) {
+        // reportId
+        self.reportId = result.reportId
+        
         // 연도
         self.year = result.year
 
@@ -137,4 +141,18 @@ final class ReportResultViewModel: ObservableObject {
             )
         }
     }
+    
+    // MARK: - 다짐 내용 저장
+    @Published var reportId: Int = 0
+    func updateContent(
+        userId: Int,
+        content: String
+    ) async throws {
+        try await reportService.updateReport(
+            userId: userId,
+            reportId: reportId, // load()에서 받은 값
+            content: content
+        )
+    }
+
 }
