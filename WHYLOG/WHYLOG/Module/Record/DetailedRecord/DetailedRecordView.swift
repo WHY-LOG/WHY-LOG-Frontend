@@ -29,9 +29,13 @@ struct DetailedRecordView: View {
                     .ignoresSafeArea()
                 VStack(alignment: .leading, spacing: 24) {
                     navi
-                    top
-                    middle
-                    bottom
+                    Spacer()
+                    VStack {
+                        top
+                        middle
+                        Spacer()
+                        bottom
+                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
