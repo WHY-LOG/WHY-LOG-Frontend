@@ -23,7 +23,7 @@ struct LoginView: View {
                         .font(.PretendardMedium12)
                         .foregroundStyle(Color.gray525252)
                         .padding(.bottom,70)
-                    OnboardingNavigationBar(title: "시작하기",action: {},destination: InitializeProfileView())
+                    PrimaryButton(title: "시작하기",action: {},destination: InitializeProfileView())
                 }
             }
         }
