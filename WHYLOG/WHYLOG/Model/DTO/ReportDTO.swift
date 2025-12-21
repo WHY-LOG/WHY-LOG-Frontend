@@ -36,3 +36,7 @@ struct CreateReportRequest: Encodable {
     let year: Int
 }
 
+struct ReportResultResponse: Decodable {
+    let result: ReportResultDTO
+}
+

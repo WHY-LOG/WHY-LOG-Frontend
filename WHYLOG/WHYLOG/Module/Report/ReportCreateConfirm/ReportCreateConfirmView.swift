@@ -21,7 +21,16 @@ struct ReportCreateConfirmView: View {
                     Spacer()
                     confirmText
                     Spacer()
-                    confirmButton
+//                    confirmButton
+                    PrimaryButton(
+                        title: "완료",
+                        action: {},
+                        destination: ReportLoadingView(
+                            userId: 1,
+                            year: year
+                        )
+                    )
+
                 }
                 .padding(.horizontal, 20)
             }
@@ -60,21 +69,24 @@ struct ReportCreateConfirmView: View {
         }
     }
     
-    // MARK: - Confirm Button
-    private var confirmButton: some View {
-        NavigationLink {
-            ReportLoadingView(year: 2025)
-        } label: {
-            Text("완료")
-                .foregroundStyle(.white)
-                .font(.PretendardBold16)
-                .padding(.vertical,18)
-                .frame(maxWidth:.infinity)
-                .background(Color.accentCoral)
-                .cornerRadius(18)
-                .padding(.horizontal,18)
-        }
-    }
+//    // MARK: - Confirm Button
+//    private var confirmButton: some View {
+//        NavigationLink {
+//            ReportLoadingView(
+//                userId: 1,
+//                year: year
+//            )
+//        } label: {
+//            Text("완료")
+//                .foregroundStyle(.white)
+//                .font(.PretendardBold16)
+//                .padding(.vertical,18)
+//                .frame(maxWidth:.infinity)
+//                .background(Color.accentCoral)
+//                .cornerRadius(18)
+//                .padding(.horizontal,18)
+//        }
+//    }
 }
 
 #Preview {

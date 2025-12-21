@@ -10,6 +10,8 @@ import SwiftUI
 struct ReportLoadingView: View {
     @Environment(\.dismiss) private var dismiss
     
+    private let reportService = ReportService()
+    
     @State private var activeDotIndex: Int = 0
     private let dotCount = 3
 
@@ -17,6 +19,7 @@ struct ReportLoadingView: View {
     @State private var goToResult = false
     @State private var loadingTask: Task<Void, Never>?
 
+    let userId: Int
     let year: Int
 
     var body: some View {
@@ -46,16 +49,30 @@ struct ReportLoadingView: View {
     // MARK: - Loading Logic
     private func startLoading() {
         loadingTask = Task {
-            // 나중에 여기서 createReport API 호출
-            try? await Task.sleep(nanoseconds: 2_500_000_000)
+            do {
+                // 리포트 생성 API
+                _ = try await reportService.createReport(
+                    userId: userId,
+                    year: year
+                )
 
-            if Task.isCancelled { return }
+                // UX용 로딩 딜레이
+                try await Task.sleep(nanoseconds: 1_000_000_000)
 
-            await MainActor.run {
-                goToResult = true
+                if Task.isCancelled { return }
+
+                // 결과 화면 이동
+                await MainActor.run {
+                    goToResult = true
+                }
+
+            } catch {
+                print("❌ 리포트 생성 실패:", error)
+                dismiss() // TODO: 에러 화면 구현 고민
             }
         }
     }
+
 
     // MARK: - Navigation Bar
     private var navigationBar: some View {
@@ -136,6 +153,12 @@ struct ReportLoadingView: View {
 
 
 #Preview {
-    ReportLoadingView(year: 2025)
+    NavigationStack {
+        ReportLoadingView(
+            userId: 4,   // 임시 userId
+            year: 2025
+        )
+    }
 }
+
 

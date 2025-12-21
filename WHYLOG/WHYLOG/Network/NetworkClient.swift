@@ -24,6 +24,8 @@ struct NetworkClient {
             }
         }
 
+        
+        
         guard let url = components?.url else {
             throw URLError(.badURL)
         }
