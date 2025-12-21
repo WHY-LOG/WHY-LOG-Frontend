@@ -9,19 +9,25 @@ import SwiftUI
 
 struct ReportLoadingView: View {
     @Environment(\.dismiss) private var dismiss
-    
+
     private let reportService = ReportService()
-    
+
+    // MARK: - State
     @State private var activeDotIndex: Int = 0
     private let dotCount = 3
 
-
-    @State private var goToResult = false
     @State private var loadingTask: Task<Void, Never>?
+    @State private var timer: Timer?
+
+    // 생성된 리포트 ID → 이게 세팅되면 결과 화면으로 이동
+    @State private var createdReportId: Int? = nil
+
+    @State private var showErrorAlert = false
 
     let userId: Int
     let year: Int
 
+    // MARK: - Body
     var body: some View {
         ZStack {
             Color(.baseCoral)
@@ -37,38 +43,64 @@ struct ReportLoadingView: View {
             }
             .padding(.horizontal, 20)
         }
-        .navigationDestination(isPresented: $goToResult) {
-            ReportResultView(year: year)
+        // ✅ reportId가 생기면 자동 이동
+        .navigationDestination(item: $createdReportId) { reportId in
+            ReportResultView(
+                reportId: reportId,
+                year: year,
+                mode: .create
+            )
         }
         .onAppear {
             startLoading()
+            startDotAnimation()
+        }
+        .onDisappear {
+            timer?.invalidate()
+            timer = nil
         }
         .navigationBarBackButtonHidden(true)
+        .alert("리포트 생성 실패",
+               isPresented: $showErrorAlert) {
+            Button("확인") {
+                dismiss()
+            }
+        } message: {
+            Text("해당 연도에 기록이 없어 리포트를 생성할 수 없어요.")
+        }
     }
 
     // MARK: - Loading Logic
     private func startLoading() {
         loadingTask = Task {
             do {
-                // 리포트 생성 API
+                // 1️⃣ 생성 시도
                 _ = try await reportService.createReport(
                     userId: userId,
                     year: year
                 )
 
-                // UX용 로딩 딜레이
-                try await Task.sleep(nanoseconds: 1_000_000_000)
+                // 2️⃣ 생성 성공 여부와 상관없이
+                //    목록을 다시 불러서 reportId 확보
+                let reports = try await reportService.fetchReports(userId: userId)
 
-                if Task.isCancelled { return }
+                if let report = reports.first(where: { $0.year == year }) {
+                    await MainActor.run {
+                        createdReportId = report.reportId
+                    }
+                    return
+                }
 
-                // 결과 화면 이동
+                // 3️⃣ 여기까지 왔으면 진짜 이상한 상황
                 await MainActor.run {
-                    goToResult = true
+                    showErrorAlert = true
                 }
 
             } catch {
-                print("❌ 리포트 생성 실패:", error)
-                dismiss() // TODO: 에러 화면 구현 고민
+                print("❌ 리포트 생성/이동 실패:", error)
+                await MainActor.run {
+                    showErrorAlert = true
+                }
             }
         }
     }
@@ -86,7 +118,7 @@ struct ReportLoadingView: View {
         .padding(.top, 28)
     }
 
-    // MARK: - Progress Indicator (점 로딩)
+    // MARK: - Progress Indicator
     private var progressIndicator: some View {
         HStack(spacing: 10) {
             ForEach(0..<dotCount, id: \.self) { index in
@@ -95,9 +127,6 @@ struct ReportLoadingView: View {
                     .frame(width: 10, height: 10)
                     .animation(.easeInOut(duration: 0.25), value: activeDotIndex)
             }
-        }
-        .onAppear {
-            startDotAnimation()
         }
     }
 
@@ -118,6 +147,8 @@ struct ReportLoadingView: View {
     private var cancelButton: some View {
         Button {
             loadingTask?.cancel()
+            timer?.invalidate()
+            timer = nil
             dismiss()
         } label: {
             Text("불러오기 취소")
@@ -126,21 +157,19 @@ struct ReportLoadingView: View {
         }
         .padding(.bottom, 90)
     }
-    
+
     // MARK: - Dot Animation
     private func startDotAnimation() {
-        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
             activeDotIndex = (activeDotIndex + 1) % dotCount
         }
     }
-    
-    
-    // MARK: - Atrributed Text
+
+    // MARK: - Attributed Text
     private var loadingText: AttributedString {
         var text = AttributedString("\(year)년 판단 리포트를\n만들고 있어요")
         text.font = .PretendardBold20
         text.foregroundColor = .gray525252
-            
 
         if let range = text.range(of: "\(year)") {
             text[range].foregroundColor = .accentCoral
@@ -150,12 +179,10 @@ struct ReportLoadingView: View {
     }
 }
 
-
-
 #Preview {
     NavigationStack {
         ReportLoadingView(
-            userId: 4,   // 임시 userId
+            userId: 5,
             year: 2025
         )
     }
