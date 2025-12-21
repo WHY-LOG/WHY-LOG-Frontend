@@ -9,13 +9,13 @@ import SwiftUI
 import PhotosUI
 
 struct InitializeProfileView: View {
-    @EnvironmentObject var profileModel: ProfileModel
-
+    //@EnvironmentObject var profileModel: ProfileModel
+    @StateObject private var viewModel = ProfileViewModel()
     var body: some View {
         ZStack {
             Color.baseCoral
                 .ignoresSafeArea()
-
+            
             VStack {
                 HStack {
                     Text("프로필 정보를 입력해주세요")
@@ -24,43 +24,49 @@ struct InitializeProfileView: View {
                     Spacer()
                 }
                 .padding(.top, 60)
-
+                
                 EditableCircleProfileImage(
-                    viewModel: profileModel,
+                    viewModel: viewModel,
                     isEditable: true        // ✅ 최초 설정은 수정 가능
                 )
                 .padding(.top, 65)
-
+                
                 PrimaryTextField(
                     placeholder: "이름을 입력하세요",
-                    text: $profileModel.name
+                    text: $viewModel.name
                 )
                 .padding(.top, 32)
-
+                
                 PrimaryTextField(
                     placeholder: "이메일을 입력하세요",
-                    text: $profileModel.email
+                    text: $viewModel.email
                 )
                 .padding(.vertical, 24)
-
+                
                 Spacer()
-
+                
                 PrimaryButton(
                     title: "완료",
                     action: {
-                        // TODO: UserDefaults / 서버 저장
+                        if viewModel.canSave{
+                            Task{
+                                await viewModel.save()
+                            }
+                        }
                     },
                     destination: FirstServiceGuideView()
-                )
+                ).disabled(!viewModel.canSave)
+                    .opacity(viewModel.canSave ? 1.0 : 0.5)
             }
             .padding(.horizontal, 20)
+        }.navigationDestination(isPresented: $viewModel.isSaveSuccess) {
+            FirstServiceGuideView()
         }
     }
 }
 
-
 struct EditableCircleProfileImage: View {
-    @ObservedObject var viewModel: ProfileModel
+    @ObservedObject var viewModel: ProfileViewModel
     let isEditable: Bool
     
     var body: some View {
@@ -122,8 +128,13 @@ struct ProfileImage: View{
     }
 }
 
-
-
 #Preview {
-    InitializeProfileView()
+    // 1. 필요한 의존성(Model) 생성
+    let profileModel = ProfileModel()
+    
+    return NavigationStack {
+        InitializeProfileView()
+            // 2. @EnvironmentObject 주입
+            .environmentObject(profileModel)
+    }
 }

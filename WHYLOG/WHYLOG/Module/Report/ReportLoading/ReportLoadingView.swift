@@ -160,5 +160,3 @@ struct ReportLoadingView: View {
         )
     }
 }
-
-

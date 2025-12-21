@@ -9,6 +9,10 @@ import Foundation
 import SwiftUI
 
 struct DetailedRecordView: View {
+    @StateObject private var viewModel = DetailedRecordViewModel()
+    @Environment(\.dismiss) var dismiss
+    let record: RecordDTO // HomeView에서 넘겨받을 데이터
+    
     @State private var showAlert = false
     @State private var alertType: AlertType = .edit
     @State private var navigateToEdit = false
@@ -37,7 +41,7 @@ struct DetailedRecordView: View {
                 }
                 
                 .navigationDestination(isPresented: $navigateToHome) {
-//                    HomeView() // 홈 화면 뷰로 연결
+                    HomeView() // 홈 화면 뷰로 연결
                 }
                 
                 if showAlert {
@@ -46,15 +50,18 @@ struct DetailedRecordView: View {
                         message: alertType == .delete ? "삭제 시 해당 내용이 모두 사라집니다." : nil,
                         action: {
                             if alertType == .edit {
-                                // 수정 로직 실행
                                 showAlert = false
                                 navigateToEdit = true
                             } else {
-                                // 삭제 로직 실행
-                                showAlert = false
-                                navigateToHome = true
+                                // 삭제 로직 추가
+                                Task {
+                                    let success = await viewModel.deleteRecord(userId: 1, recordId: record.recordId) //
+                                    if success {
+                                        showAlert = false
+                                        dismiss() // 또는 navigateToHome = true
+                                    }
+                                }
                             }
-                            showAlert = false
                         },
                         cancelAction: { showAlert = false }
                     )
@@ -102,11 +109,41 @@ struct DetailedRecordView: View {
     
     // MARK: - middle
     var middle: some View {
-        VStack {
-            ZStack(alignment: .bottomTrailing) {
-                // 기록 카드 공용 컴포넌트
+        VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 18) {
+                HStack {
+                    // 월 표시
+                    Text(record.occurDate + " 기록")
+                        .font(.PretendardBold20)
+                        .foregroundColor(.gray525252)
+                    Spacer()
+                    // 선택했던 감정들 칩으로 표시
+                    HStack {
+                        ForEach(record.categories, id: \.self) { text in
+                            ChipButton(text: text, state: .constant(.completed))
+                        }
+                    }
+                }
                 
-                // 수정/삭제 버튼 컴포넌트
+                // 제목
+                Text(record.title)
+                    .font(.PretendardBold20)
+                    .foregroundColor(.gray525252)
+                
+                // 내용
+                Text(record.content)
+                    .font(.PretendardMedium16)
+                    .foregroundColor(.gray525252)
+                    .lineSpacing(4)
+            }
+            .padding(33)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.white)
+            .cornerRadius(20)
+            
+            // 수정/삭제 버튼
+            HStack {
+                Spacer()
                 ActionButtons(
                     onEdit: {
                         alertType = .edit
@@ -117,7 +154,6 @@ struct DetailedRecordView: View {
                         withAnimation { showAlert = true }
                     }
                 )
-                .padding(20)
             }
         }
     }
@@ -126,11 +162,11 @@ struct DetailedRecordView: View {
     // MARK: - bottom
     var bottom: some View {
         VStack() {
-            PrimaryButton(title: "완료",action: {},destination: InitializeProfileView()) //도착 수정 -> 홈 뷰
+            PrimaryButton(title: "완료",action: {},destination: HomeView())
         }
     }
 }
 
 #Preview {
-    DetailedRecordView()
-}
+        DetailedRecordView(record: RecordDTO(recordId: 1, title: "제목", content: "내용", occurDate: "3", categories: ["회피"]))
+    }

@@ -5,11 +5,6 @@
 //  Created by 김진서 on 12/20/25.
 //
 
-//
-//  ReportResultViewModel.swift
-//  WHYLOG
-//
-
 import Foundation
 import Combine
 
