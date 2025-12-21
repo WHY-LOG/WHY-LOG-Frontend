@@ -30,7 +30,7 @@ struct HomeView: View {
         self.isLoading = true
         do {
             let fetched = try await RecordService.shared.fetchRecords(
-                userId: 5,
+                userId: 17,
                 year: selectedYear,
                 month: Int(selectedMonth.MonthNumber) ?? 1
             )

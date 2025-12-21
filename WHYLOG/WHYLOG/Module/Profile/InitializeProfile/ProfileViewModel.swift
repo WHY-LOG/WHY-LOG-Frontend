@@ -70,6 +70,8 @@ class ProfileViewModel: ObservableObject {
             self.email = data.email
             self.imgUrl = data.imgUrl ?? ""
             
+            print("✅ 데이터 로드 성공: 이름=\(self.name), 이메일=\(self.email)")
+            
             if let urlString = data.imgUrl, let url = URL(string: urlString) {
                 await downloadImage(from: url)
             }
@@ -79,7 +81,7 @@ class ProfileViewModel: ObservableObject {
     }
 
     /// 3. 프로필 정보 업데이트 (PUT) - 마이페이지 수정 완료 시 사용
-    func saveProfile() async {
+    func updateProfile() async {
         isLoading = true
         defer { isLoading = false }
         
@@ -98,6 +100,12 @@ class ProfileViewModel: ObservableObject {
         
         do {
             try await service.deleteProfile()
+            self.name = ""
+            self.email = ""
+            self.imgUrl = ""
+            self.imageState = .empty
+                    
+            print("✅ 프로필 삭제 및 로컬 데이터 초기화 완료")
             return true
         } catch {
             self.errorMessage = "삭제 실패: \(error.localizedDescription)"
