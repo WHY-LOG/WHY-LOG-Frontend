@@ -10,8 +10,9 @@ import SwiftUI
 
 struct CreateRecordView: View {
     @StateObject private var viewModel = CreateRecordViewModel()
-    
     @Environment(\.dismiss) var dismiss
+    
+    var onComplete: (() -> Void)?
     
     var body: some View {
         NavigationStack{
@@ -28,11 +29,12 @@ struct CreateRecordView: View {
                 .padding(.bottom, 20)
             }
         }
-        .onChange(of: viewModel.isSuccess) { oldValue, newValue in
-            if newValue {
-                dismiss()
-            }
-        }
+        .onChange(of: viewModel.isSuccess) { _, newValue in
+                    if newValue {
+                        onComplete?() // 1. 홈 화면에 알려줌
+                        dismiss()     // 2. 화면 닫기
+                    }
+                }
     }
     
     // MARK: - top

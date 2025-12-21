@@ -9,10 +9,14 @@ import Foundation
 import SwiftUI
 
 struct DetailedRecordView: View {
+    @Environment(\.dismiss) var dismiss
+    
     @State private var showAlert = false
     @State private var alertType: AlertType = .edit
     @State private var navigateToEdit = false
     @State private var navigateToHome = false
+    
+    let record: RecordDTO
     
     enum AlertType {
             case edit, delete
@@ -81,6 +85,7 @@ struct DetailedRecordView: View {
     var navi: some View {
         HStack {
             Button {
+                dismiss()
             } label: {
                 Image("arrow_back")
                     .resizable()
@@ -132,5 +137,12 @@ struct DetailedRecordView: View {
 }
 
 #Preview {
-    DetailedRecordView()
+    // record 매개변수에 임시 데이터를 전달해야 에러가 사라집니다.
+    DetailedRecordView(record: RecordDTO(
+        recordId: 1,
+        title: "테스트 제목",
+        content: "테스트 내용입니다.",
+        occurDate: "2025-03",
+        categories: ["회피", "두려움"]
+    ))
 }

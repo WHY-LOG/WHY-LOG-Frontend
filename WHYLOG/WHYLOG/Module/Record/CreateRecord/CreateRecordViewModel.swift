@@ -8,12 +8,8 @@
 import Foundation
 import Combine
 
-@MainActor // UI 업데이트를 위해 MainActor 유지
+@MainActor
 class CreateRecordViewModel: ObservableObject {
-    
-    // MARK: - UI State
-    
-    // 감정
     @Published var emotions: [EmotionItem] = [
         EmotionItem(text: "비교", state: .unselected),
         EmotionItem(text: "두려움", state: .unselected),
@@ -23,72 +19,46 @@ class CreateRecordViewModel: ObservableObject {
         EmotionItem(text: "책임감", state: .unselected),
     ]
     
-    // 달력
     @Published var selectedMonth: String = "날짜 선택"
     @Published var showMonthGraph: Bool = false
+    @Published var whatHappened: String = ""
+    @Published var whyAction: String = ""
     
-    var isDateSelected: Bool {
-        selectedMonth != "날짜 선택"
-    }
-    
-    // 기록 (제목, 내용)
-    @Published var whatHappened: String = "" // -> title로 매핑
-    @Published var whyAction: String = ""    // -> content로 매핑
-    
-    // MARK: - API State (새로 추가된 부분)
     @Published var isLoading: Bool = false
-    @Published var isSuccess: Bool = false // true -> View에서 화면 닫음
-    @Published var errorMessage: String? = nil
-    
-    
-    // MARK: - Logic
-    
-    func completeRecord() {
-        for index in emotions.indices {
-            if emotions[index].state == .selected {
-                emotions[index].state = .completed
-            }
-        }
-    }
-    
+    @Published var isSuccess: Bool = false
+
+    var isDateSelected: Bool { selectedMonth != "날짜 선택" }
+
     func uploadRecord() {
-        // 유효성 검사
-        guard isDateSelected, !whatHappened.isEmpty, !whyAction.isEmpty else {
-            print("입력되지 않은 값이 있습니다.")
-            return
-        }
-        
+        guard isDateSelected, !whatHappened.isEmpty, !whyAction.isEmpty else { return }
         self.isLoading = true
         
-        // 데이터 변환
+        // 1. 날짜 포맷팅: "2025. 3" -> "2025-03" (Swagger/명세서 규격)
+        let monthString = selectedMonth.components(separatedBy: ".").last?.filter { $0.isNumber } ?? ""
+        let monthInt = Int(monthString) ?? 1
+        let formattedMonth = String(format: "%02d", monthInt)
+        let finalOccurDate = "2025-\(formattedMonth)" // 예: "2025-03"
+        
+        // 2. 카테고리 ID 추출 (선택된 항목들의 인덱스+1)
         let selectedCategoryIds = emotions.enumerated()
-            .filter { $0.element.state == .selected || $0.element.state == .completed }
+            .filter { $0.element.state == .selected }
             .map { $0.offset + 1 }
         
-        // API 호출
         Task {
             do {
-                // ⚠️ 테스트용 userId = 1 (로그인 구현 후 실제 ID로 교체 필요)
-                let userId = 1
-                
-                // Service 호출
-                let _ = try await RecordService.shared.createRecord(
-                    userId: userId,
+                // 백엔드 확인 사항: userId를 5로 전송
+                _ = try await RecordService.shared.createRecord(
+                    userId: 5,
                     title: whatHappened,
                     content: whyAction,
-                    occurDate: selectedMonth,
+                    occurDate: finalOccurDate,
                     categoryIds: selectedCategoryIds
                 )
-                
-                print("기록 생성 성공!")
+                print("✅ 생성 성공! 날짜: \(finalOccurDate)")
                 self.isSuccess = true
-                self.completeRecord()
-                
             } catch {
-                print("기록 생성 실패: \(error)")
-                self.errorMessage = "기록 저장에 실패했습니다."
+                print("❌ 생성 실패: \(error)")
             }
-            
             self.isLoading = false
         }
     }

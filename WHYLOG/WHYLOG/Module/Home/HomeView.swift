@@ -8,23 +8,43 @@
 import SwiftUI
 
 struct HomeView: View {
+    // MARK: - API 데이터 상태
+    @State private var records: [RecordDTO] = [] // API에서 받아올 실제 데이터 바구니
+    @State private var isLoading: Bool = false
+    
     @StateObject private var profileViewModel = ProfileViewModel()
     @State private var selectedYear: Int = 2025
     @State private var selectedMonth: MonthListState = .Mar
     
     // 추가 3 관련: 선택된 유형에 따른 감정 상태
-    @State private var selectedEmotionType: SelectionType? = nil // "유형" 선택 상태
+    @State private var selectedEmotionType: SelectionType? = nil
     
-    // 추가 2 관련: 6개씩 끊어서 보여주기 위한 페이지 상태 (0: Jan~Jun, 1: Jul~Dec)
+    // 추가 2 관련: 페이지 상태 (0: Jan~Jun, 1: Jul~Dec)
     @State private var monthPage: Int = 0
     
-    // 추가 1 관련: 필터링된 로그 계산
-    private var filteredLogs: [RecordCardModel] {
-        mockLogs.filter { log in
-            // log의 날짜 정보가 selectedMonth와 일치하는지 확인 (MonthNumber 비교)
-            // 예: "3" == "3"
-            log.month == selectedMonth.MonthNumber
+    // MARK: - 필터링 로직 (API에서 받아온 records 사용)
+    private var filteredLogs: [RecordDTO] {
+        records.filter { log in
+            // 서버 날짜(예: "2025-03")에 현재 선택된 월 번호("3")가 포함되는지 확인
+            log.occurDate.contains(selectedMonth.MonthNumber)
         }
+    }
+    
+    // MARK: - 데이터 로드 함수 (userId: 5 적용)
+    func loadRecords() async {
+        self.isLoading = true
+        do {
+            // 백엔드 확인 사항에 따라 userId를 5로 고정
+            let fetched = try await RecordService.shared.fetchRecords(
+                userId: 5,
+                year: selectedYear,
+                month: Int(selectedMonth.MonthNumber) ?? 1
+            )
+            self.records = fetched
+        } catch {
+            print("❌ 기록 로드 실패: \(error)")
+        }
+        self.isLoading = false
     }
 
     var body: some View {
@@ -33,19 +53,11 @@ struct HomeView: View {
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // 상단 헤더
                 headerView
-                
-                // 연도 선택
                 yearSelector
-                
-                // 추가 2: 월 선택 영역 (6개 노출 및 버튼 이동)
                 monthSelector
-                
-                // 추가 2: Swipe 버튼 (페이지 전환)
                 swipeButtons
                 
-                // 추가 3: 유형 클릭 시 나타나는 감정 칩 영역
                 if let type = selectedEmotionType {
                     emotionChipGroup(for: type)
                         .padding(.top, 10)
@@ -53,22 +65,24 @@ struct HomeView: View {
                 
                 Spacer(minLength: 20)
                 
-                // 추가 1: 필터링된 기록 리스트
                 recordScrollView
             }
             .padding(.horizontal, 20)
             
-            // 플로팅 버튼
             VStack {
                 Spacer()
                 addButton
             }
         }
         .navigationBarBackButtonHidden(true)
+        // 화면 로드 및 월/연도 변경 시 자동 새로고침
+        .task { await loadRecords() }
+        .onChange(of: selectedMonth) { _, _ in Task { await loadRecords() } }
+        .onChange(of: selectedYear) { _, _ in Task { await loadRecords() } }
     }
 }
 
-// MARK: - 하위 뷰 구성
+// MARK: - 하위 뷰 구성 (Extension)
 extension HomeView {
     
     private var headerView: some View {
@@ -77,12 +91,11 @@ extension HomeView {
                 .resizable()
                 .frame(width: 97, height: 25)
             
-            // 추가 3: 선택 시 상태 업데이트를 위해 바인딩 전달 (컴포넌트 수정 필요)
             EmotionDropdown(selectedType: $selectedEmotionType)
             
             Spacer()
             
-            NavigationLink(destination: EmptyView()) { // ReportListView()
+            NavigationLink(destination: EmptyView()) {
                 Image(systemName: "text.document")
                     .resizable()
                     .scaledToFit()
@@ -117,7 +130,6 @@ extension HomeView {
     
     private var monthSelector: some View {
         let allMonths = MonthListState.allCases
-        // 페이지에 따라 0~5(Jan~Jun) 또는 6~11(Jul~Dec) 슬라이싱
         let displayMonths = monthPage == 0 ? Array(allMonths[0...5]) : Array(allMonths[6...11])
         
         return HStack(spacing: 15) {
@@ -125,7 +137,6 @@ extension HomeView {
                 MonthButton(state: month, isOn: selectedMonth == month) {
                     withAnimation(.spring()) {
                         selectedMonth = month
-                        // 여기서 실제 API fetch 함수를 호출할 수 있습니다.
                     }
                 }
             }
@@ -135,21 +146,17 @@ extension HomeView {
     private var swipeButtons: some View {
         HStack(spacing: 10) {
             Button(action: { withAnimation { monthPage = 0 } }) {
-                Image("swipe1")
-                    .opacity(monthPage == 0 ? 1.0 : 0.3)
+                Image("swipe1").opacity(monthPage == 0 ? 1.0 : 0.3)
             }
             Button(action: { withAnimation { monthPage = 1 } }) {
-                Image("swipe2")
-                    .opacity(monthPage == 1 ? 1.0 : 0.3)
+                Image("swipe2").opacity(monthPage == 1 ? 1.0 : 0.3)
             }
         }
-        .padding(.top,20)
+        .padding(.top, 20)
     }
     
-    // 추가 3: 감정 칩 뷰
     private func emotionChipGroup(for type: SelectionType) -> some View {
         HStack(spacing: 8) {
-            // 예시 데이터: 실제로는 유형별 감정 배열을 매핑해야 합니다.
             let chips = ["회피", "두려움", "불안"]
             ForEach(chips, id: \.self) { text in
                 ChipButton(text: text, state: .constant(.completed))
@@ -166,25 +173,31 @@ extension HomeView {
                         .foregroundColor(.gray)
                         .padding(.top, 50)
                 } else {
-                    ForEach(filteredLogs) { record in
-                        RecordCard(recordCardModel: record)
+                    ForEach(filteredLogs) { log in
+                        // DetailedRecordView 호출 시 record 인자 명시
+                        NavigationLink(destination: DetailedRecordView(record: log)) {
+                            RecordCard(record: log)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
                 }
             }
-            .padding(.bottom, 100) // addButton 공간 확보
+            .padding(.bottom, 100)
         }
     }
-}
-
-private var addButton: some View {
-            NavigationLink {
-                CreateRecordView()
-            } label: {
-                AddButtonUI()
-            }.padding(.bottom, 28)
+    
+    private var addButton: some View {
+        NavigationLink {
+            // 생성 완료 시 목록을 다시 불러오도록 콜백 연결
+            CreateRecordView {
+                Task { await loadRecords() }
+            }
+        } label: {
+            AddButtonUI()
         }
-
-
+        .padding(.bottom, 28)
+    }
+}
 #Preview {
     HomeView()
 }
