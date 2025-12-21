@@ -8,16 +8,20 @@
 import Foundation
 
 struct ProfileService {
-    private let userId: Int = 17
+    
+    private var userId: Int {
+        UserSession.shared.userId ?? 17
+    }
     
     func createProfile(name: String, email: String, imgUrl: String) async throws {
         let profile = UserProfileResponse(name: name, email: email, imgUrl: imgUrl)
         let body = try JSONEncoder().encode(profile)
         
-        let _: UserProfileResponse = try await NetworkClient.request(
+        let response: CreateUserResponse = try await NetworkClient.request(
             endpoint: .createUser,
             body: body
         )
+        UserSession.shared.userId = response.success.userId
     }
 
     /// 서버에서 프로필 정보 가져오기
@@ -49,5 +53,6 @@ struct ProfileService {
         let _: APIResponse<String> = try await NetworkClient.request(
             endpoint: .deleteUser(userId: userId)
         )
+        UserSession.shared.userId = nil
     }
 }

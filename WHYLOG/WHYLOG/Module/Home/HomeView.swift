@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import Combine
 
 struct HomeView: View {
     // MARK: - API 데이터 상태
     @State private var records: [RecordDTO] = []
     @State private var isLoading: Bool = false
-    
+    @ObservedObject var userSession = UserSession.shared
     @StateObject private var profileViewModel = ProfileViewModel()
     @State private var selectedYear: Int = 2025
     @State private var selectedMonth: MonthListState = .Mar
@@ -27,16 +28,18 @@ struct HomeView: View {
     
     // MARK: - 데이터 로드 함수 (userId: 5 적용)
     func loadRecords() async {
+        let currentUserId = userSession.userId ?? 17
         self.isLoading = true
         do {
             let fetched = try await RecordService.shared.fetchRecords(
-                userId: 17,
+                userId: currentUserId,
                 year: selectedYear,
                 month: Int(selectedMonth.MonthNumber) ?? 1
             )
             self.records = fetched
         } catch {
             print("❌ 기록 로드 실패: \(error)")
+            print("✅ \(currentUserId)번 유저의 기록 로드 성공")
         }
         self.isLoading = false
     }
@@ -80,7 +83,7 @@ extension HomeView {
             Image("WHYLOGLogo").resizable().frame(width: 97, height: 25)
             EmotionDropdown(selectedType: $selectedEmotionType)
             Spacer()
-            NavigationLink(destination: ReportListView()) {
+
                 Image(systemName: "text.document").resizable().scaledToFit().frame(width: 24, height: 24).foregroundColor(.gray525252)
             }
             NavigationLink(destination: MyProfileView(viewModel: profileViewModel)) {

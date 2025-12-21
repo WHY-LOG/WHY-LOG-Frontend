@@ -10,6 +10,7 @@ import SwiftUI
 
 struct CreateRecordView: View {
     @StateObject private var viewModel = CreateRecordViewModel()
+    
     @Environment(\.dismiss) var dismiss
     
     // MARK: - 인자 추가

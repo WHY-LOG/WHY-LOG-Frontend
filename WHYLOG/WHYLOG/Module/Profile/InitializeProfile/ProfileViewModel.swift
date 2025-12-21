@@ -20,6 +20,7 @@ class ProfileViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published private(set) var imageState: ProfileModel.ImageState = .empty
+    @ObservedObject var userSession = UserSession.shared
     
     // MARK: - Dependencies
     private let service = ProfileService()
@@ -63,6 +64,7 @@ class ProfileViewModel: ObservableObject {
     func fetchProfile() async {
         isLoading = true
         defer { isLoading = false }
+        print("🚀 API 요청 ID 확인: \(UserSession.shared.userId ?? 17)")
         
         do {
             let data = try await service.getProfile()
