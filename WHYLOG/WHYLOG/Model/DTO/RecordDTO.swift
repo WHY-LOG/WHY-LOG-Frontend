@@ -73,3 +73,10 @@ struct RecordDTO: Decodable {
         case categories
     }
 }
+
+extension RecordDTO: Identifiable {
+    // 서버가 주는 recordId를 SwiftUI의 id로 쓰겠다고 선언 (서버 데이터 안 바뀜)
+    var id: Int {
+        return self.recordId
+    }
+}
