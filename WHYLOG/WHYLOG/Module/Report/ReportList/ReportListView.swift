@@ -10,12 +10,12 @@ import SwiftUI
 struct ReportListView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = ReportListViewModel()
-
+    
     var body: some View {
         ZStack {
             Color(.baseCoral)
                 .ignoresSafeArea()
-
+            
             VStack {
                 navigationBar
                 contentView
@@ -25,10 +25,11 @@ struct ReportListView: View {
         }
         .navigationBarBackButtonHidden(true)
         .onAppear {
-            viewModel.loadMock()
+            Task {
+                await viewModel.load(userId: 1) // 임시 userId
+            }
         }
     }
-
     // MARK: - Content View
     private var contentView: some View {
         Group {
@@ -39,11 +40,17 @@ struct ReportListView: View {
             }
         }
     }
-
+    
     // MARK: - Report List
+    
+    private let columns = [
+        GridItem(.flexible()),
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
     private func reportListView(_ years: [Int]) -> some View {
         ScrollView {
-            VStack(spacing: 16) {
+            LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(years, id: \.self) { year in
                     NavigationLink {
                         ReportResultView(year: year)
@@ -55,10 +62,11 @@ struct ReportListView: View {
                     }
                 }
             }
-            .padding(.top, 50)
+            .padding(.top, 40)
         }
     }
-
+    
+    
     // MARK: - Navigation Bar
     private var navigationBar: some View {
         VStack {
@@ -68,24 +76,24 @@ struct ReportListView: View {
                     .frame(width: 86, height: 22)
                 Spacer()
             }
-
+            
             HStack {
                 Button { dismiss() } label: {
                     Image("arrow_back")
                         .resizable()
                         .frame(width: 10, height: 18)
                 }
-
+                
                 Spacer()
-
+                
                 Text("판단 기준 리포트 목록")
                     .font(.PretendardBold16)
-
+                
                 Spacer()
             }
         }
     }
-
+    
     // MARK: - Empty State
     private var emptyStateView: some View {
         VStack {
@@ -93,18 +101,18 @@ struct ReportListView: View {
             Image("sentiment_dissatisfied")
                 .resizable()
                 .frame(width: 60, height: 60)
-
+            
             Text("아직 생성된 리포트가 없습니다")
                 .font(.PretendardBold20)
-
+            
             Text("회고를 바탕으로\n나만의 리포트를 만들어보세요")
                 .font(.PretendardMedium12)
                 .multilineTextAlignment(.center)
-
+            
             Spacer()
         }
     }
-
+    
     // MARK: - Add Button
     private var addButton: some View {
         VStack {
@@ -122,7 +130,6 @@ struct ReportListView: View {
         }
     }
 }
-
 #Preview {
     ReportListView()
 }

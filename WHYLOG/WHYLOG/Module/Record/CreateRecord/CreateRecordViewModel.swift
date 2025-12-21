@@ -10,6 +10,11 @@ import Combine
 
 @MainActor
 class CreateRecordViewModel: ObservableObject {
+    // MARK: - Mode State
+    @Published var isEditMode: Bool = false
+    var targetRecordId: Int?
+    
+    // MARK: - UI State
     @Published var emotions: [EmotionItem] = [
         EmotionItem(text: "비교", state: .unselected),
         EmotionItem(text: "두려움", state: .unselected),
@@ -26,27 +31,50 @@ class CreateRecordViewModel: ObservableObject {
     
     @Published var isLoading: Bool = false
     @Published var isSuccess: Bool = false
-
+    
     var isDateSelected: Bool { selectedMonth != "날짜 선택" }
+
+    // MARK: - 수정 모드 설정
+    func setupEditMode(with record: RecordDTO) {
+        self.isEditMode = true
+        self.targetRecordId = record.recordId
+        self.whatHappened = record.title
+        self.whyAction = record.content
+        
+        // 날짜 변환 ("2025-12..." -> "2025. 12")
+        let components = record.occurDate.components(separatedBy: "-")
+        if components.count >= 2 {
+            let month = Int(components[1].filter { $0.isNumber }) ?? 1
+            self.selectedMonth = "2025. \(month)"
+        }
+
+        // 카테고리 매칭
+        let serverCategoryNames = record.categories.map { $0.categoryName }
+            
+            for index in emotions.indices {
+                if serverCategoryNames.contains(emotions[index].text) {
+                    emotions[index].state = .selected
+                }
+            }
+    }
 
     func uploadRecord() {
         guard isDateSelected, !whatHappened.isEmpty, !whyAction.isEmpty else { return }
+        
+        if isEditMode {
+            updateRecord()
+        } else {
+            createRecord()
+        }
+    }
+
+    private func createRecord() {
         self.isLoading = true
-        
-        // 1. 날짜 포맷팅: "2025. 3" -> "2025-03" (Swagger/명세서 규격)
-        let monthString = selectedMonth.components(separatedBy: ".").last?.filter { $0.isNumber } ?? ""
-        let monthInt = Int(monthString) ?? 1
-        let formattedMonth = String(format: "%02d", monthInt)
-        let finalOccurDate = "2025-\(formattedMonth)" // 예: "2025-03"
-        
-        // 2. 카테고리 ID 추출 (선택된 항목들의 인덱스+1)
-        let selectedCategoryIds = emotions.enumerated()
-            .filter { $0.element.state == .selected }
-            .map { $0.offset + 1 }
+        let finalOccurDate = formatMonthForAPI()
+        let selectedCategoryIds = getSelectedCategoryIds()
         
         Task {
             do {
-                // 백엔드 확인 사항: userId를 5로 전송
                 _ = try await RecordService.shared.createRecord(
                     userId: 5,
                     title: whatHappened,
@@ -54,12 +82,49 @@ class CreateRecordViewModel: ObservableObject {
                     occurDate: finalOccurDate,
                     categoryIds: selectedCategoryIds
                 )
-                print("✅ 생성 성공! 날짜: \(finalOccurDate)")
+                print("✅ 생성 성공: \(finalOccurDate)")
                 self.isSuccess = true
             } catch {
-                print("❌ 생성 실패: \(error)")
+                print("❌ 생성 실패 상세: \(error)")
             }
             self.isLoading = false
         }
+    }
+
+    private func updateRecord() {
+        guard let recordId = targetRecordId else { return }
+        self.isLoading = true
+        let finalOccurDate = formatMonthForAPI()
+        let selectedCategoryIds = getSelectedCategoryIds()
+        
+        Task {
+            do {
+                _ = try await RecordService.shared.updateRecord(
+                    userId: 5,
+                    recordId: recordId,
+                    title: whatHappened,
+                    content: whyAction,
+                    occurDate: finalOccurDate,
+                    categoryIds: selectedCategoryIds
+                )
+                print("✅ 수정 성공: \(recordId)")
+                self.isSuccess = true
+            } catch {
+                print("❌ 수정 실패 상세: \(error)")
+            }
+            self.isLoading = false
+        }
+    }
+
+    private func formatMonthForAPI() -> String {
+        let monthString = selectedMonth.components(separatedBy: ".").last?.filter { $0.isNumber } ?? ""
+        let monthInt = Int(monthString) ?? 1
+        return String(format: "2025-%02d", monthInt)
+    }
+
+    private func getSelectedCategoryIds() -> [Int] {
+        return emotions.enumerated()
+            .filter { $0.element.state == .selected || $0.element.state == .completed }
+            .map { $0.offset + 1 }
     }
 }

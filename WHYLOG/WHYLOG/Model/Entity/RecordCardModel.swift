@@ -16,6 +16,12 @@ struct RecordCardModel: Identifiable {
     let emotion: [String]
 }
 
-let mockLogs = [
-    RecordCardModel(year: 2024, month: "3", title: "싸원던 친구에게 다가가 화해를 하지 못 했다.", content: "사실 별거 아닌 거 그냥 먼저 얘기 꺼냈으면 되는건데, 자존심 때문에 소중한 인연을 놓칠 뻔 했던 것 같다. 다음에는...", emotion: ["두려움","회피"])
+let mockLogs: [RecordDTO] = [
+    RecordDTO(
+        recordId: 1,
+        title: "화해하지 못한 기록",
+        content: "자존심 때문에 소중한 인연을 놓칠 뻔 했다.",
+        occurDate: "2025-03",
+        categories: [CategoryDTO(categoryId: 4, categoryName: "회피")]
+    )
 ]
