@@ -7,25 +7,34 @@
 
 import SwiftUI
 
+enum ReportEntryMode {
+    case readOnly      // 리스트에서 들어옴
+    case create        // 생성 직후
+}
+
+enum AlertType {
+    case edit, delete
+}
 
 struct ReportResultView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = ReportResultViewModel()
-
+    
+    let year: Int
+    let mode: ReportEntryMode
+    
+    @State private var isEditing: Bool = false
 
     @State private var writingText: String = ""
-    
     
     @State private var showAlert = false
     @State private var alertType: AlertType = .edit
     @State private var navigateToEdit = false
     @State private var navigateToHome = false
     
-    enum AlertType {
-            case edit, delete
-        }
     
-    let year: Int
+    
+    
     
     var body: some View {
         NavigationStack {
@@ -55,7 +64,7 @@ struct ReportResultView: View {
                         action: {
                             Task {
                                 try? await viewModel.updateContent(
-                                    userId: 3,
+                                    userId: 1,
                                     content: writingText
                                 )
                             }
@@ -71,9 +80,9 @@ struct ReportResultView: View {
                         message: alertType == .delete ? "삭제 시 해당 내용이 모두 사라집니다." : nil,
                         action: {
                             if alertType == .edit {
-                                navigateToEdit = true
+                                isEditing = true
                             } else {
-                                navigateToHome = true
+                                navigateToHome = true // TODO: 삭제 후 리스트로 이동으로 변경 필요
                             }
                             showAlert = false
                         },
@@ -82,16 +91,9 @@ struct ReportResultView: View {
                         }
                     )
                     .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                    
                 }
                 
-            }
-            .navigationDestination(isPresented: $navigateToEdit) {
-                // 수정 화면 (예: 리포트 수정 화면)
-                ReportResultView(year: 2025)
-            }
-            
-            .navigationDestination(isPresented: $navigateToHome) {
-                CreateRecordView()
             }
         }
         .onAppear {
@@ -100,9 +102,12 @@ struct ReportResultView: View {
                     userId: 1,   // TODO: 로그인 연동 후 실제 userId로 교체
                     year: year
                 )
+                if mode == .create {
+                    isEditing = true
+                }
             }
         }
-
+        
         .navigationBarBackButtonHidden(true)
     }
         
@@ -133,20 +138,6 @@ struct ReportResultView: View {
         .padding(.bottom, 21)
     }
     
-//    // MARK: - Confirm Button
-//    private var confirmButton: some View {
-//        NavigationLink {
-//            HomeView() // 이동할 뷰 선택
-//        } label: {
-//            Text("완료")
-//                .foregroundStyle(.white)
-//                .font(.PretendardBold16)
-//                .padding(.vertical,18)
-//                .frame(maxWidth:.infinity)
-//                .background(Color.accentCoral)
-//                .cornerRadius(18)
-//        }
-//    }
     
     // MARK: - Top Content
     private var topContent: some View {
@@ -287,6 +278,7 @@ struct ReportResultView: View {
                     .padding(.vertical, 8)
                     .background(Color.clear)
                     .scrollContentBackground(.hidden)
+                    .disabled(!isEditing)
             }
         }
     }
@@ -297,7 +289,7 @@ struct ReportResultView: View {
     
 #Preview {
     NavigationStack {
-        ReportResultView(year: 2025)
+        ReportResultView(year: 2025, mode: .readOnly)
             .environmentObject(ReportStore())
     }
 }

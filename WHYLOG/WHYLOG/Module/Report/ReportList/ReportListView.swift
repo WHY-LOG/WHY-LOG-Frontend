@@ -55,7 +55,7 @@ struct ReportListView: View {
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(years, id: \.self) { year in
                     NavigationLink {
-                        ReportResultView(year: year)
+                        ReportResultView(year: year, mode: .create)
                     } label: {
                         YearReportCard(
                             year: year,

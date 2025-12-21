@@ -40,3 +40,8 @@ struct ReportResultResponse: Decodable {
     let result: ReportResultDTO
 }
 
+
+// MARK: - Update Report Request
+struct UpdateReportRequest: Encodable {
+    let content: String
+}

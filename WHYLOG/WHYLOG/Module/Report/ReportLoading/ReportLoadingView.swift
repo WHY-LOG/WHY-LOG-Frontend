@@ -38,7 +38,7 @@ struct ReportLoadingView: View {
             .padding(.horizontal, 20)
         }
         .navigationDestination(isPresented: $goToResult) {
-            ReportResultView(year: year)
+            ReportResultView(year: year, mode: .create)
         }
         .onAppear {
             startLoading()

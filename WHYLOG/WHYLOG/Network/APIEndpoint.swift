@@ -9,7 +9,7 @@ enum APIEndpoint {
 
     // MARK: - Report
     case createReport(userId: Int)
-    case fetchReports(userId: Int) // 리스트 조회
+    case fetchReports(userId: Int)
     case updateReport(userId: Int, reportId: Int)
     case deleteReport(userId: Int, reportId: Int)
 
