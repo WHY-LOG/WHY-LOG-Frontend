@@ -10,6 +10,7 @@ import SwiftUI
 struct ReportListView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = ReportListViewModel()
+    @ObservedObject var userSession = UserSession.shared
     
     var body: some View {
         ZStack {
@@ -28,7 +29,8 @@ struct ReportListView: View {
         .navigationBarBackButtonHidden(true)
         .onAppear {
             Task {
-                await viewModel.load(userId: 5) // 임시 userId
+                let currentId = userSession.userId ?? 17
+                await viewModel.load(userId: currentId)
             }
         }
     }

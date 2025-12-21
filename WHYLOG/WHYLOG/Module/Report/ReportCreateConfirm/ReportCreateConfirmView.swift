@@ -20,7 +20,7 @@ struct ReportCreateConfirmView: View {
                     title: "완료",
                     action: {},
                     destination: ReportLoadingView(
-                        userId: 5,
+                        userId: UserSession.shared.userId ?? 17,
                         year: year
                     )
                 )

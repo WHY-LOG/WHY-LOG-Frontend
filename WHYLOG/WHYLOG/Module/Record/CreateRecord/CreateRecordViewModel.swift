@@ -7,11 +7,13 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 @MainActor
 class CreateRecordViewModel: ObservableObject {
     // MARK: - Mode State
     @Published var isEditMode: Bool = false
+    @ObservedObject var userSession = UserSession.shared // ✅ 추가
     var targetRecordId: Int?
     
     // MARK: - UI State
@@ -72,11 +74,12 @@ class CreateRecordViewModel: ObservableObject {
         self.isLoading = true
         let finalOccurDate = formatMonthForAPI()
         let selectedCategoryIds = getSelectedCategoryIds()
+        let currentUserId = UserSession.shared.userId ?? 17
         
         Task {
             do {
                 _ = try await RecordService.shared.createRecord(
-                    userId: 5,
+                    userId: currentUserId,
                     title: whatHappened,
                     content: whyAction,
                     occurDate: finalOccurDate,
@@ -96,11 +99,12 @@ class CreateRecordViewModel: ObservableObject {
         self.isLoading = true
         let finalOccurDate = formatMonthForAPI()
         let selectedCategoryIds = getSelectedCategoryIds()
+        let currentUserId = UserSession.shared.userId ?? 17
         
         Task {
             do {
                 _ = try await RecordService.shared.updateRecord(
-                    userId: 5,
+                    userId: currentUserId,
                     recordId: recordId,
                     title: whatHappened,
                     content: whyAction,

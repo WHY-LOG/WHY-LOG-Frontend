@@ -12,6 +12,7 @@ import Combine
 struct MyProfileView: View {
 
     @ObservedObject var viewModel: ProfileViewModel
+    @ObservedObject var userSession = UserSession.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var isEditing: Bool = false
@@ -106,7 +107,13 @@ struct MyProfileView: View {
                 )
             }
         }.task {
+            print("👤 MyProfileView 진입 - 현재 세션 ID: \(userSession.userId ?? -1)")
             await viewModel.fetchProfile()
+        }.onChange(of: userSession.userId) { oldId, newId in
+            print("🔄 세션 아이디 변경 감지: \(oldId ?? -1) -> \(newId ?? -1)")
+            Task {
+                await viewModel.fetchProfile()
+            }
         }
     }
 
