@@ -24,6 +24,8 @@ struct NetworkClient {
             }
         }
 
+        
+        
         guard let url = components?.url else {
             throw URLError(.badURL)
         }
@@ -35,18 +37,16 @@ struct NetworkClient {
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.httpBody = body
 
-        print("🚀 Request URL: \(url)")
-        print("📦 Request Body: \(String(data: body ?? Data(), encoding: .utf8) ?? "")")
-
+        print("🌐 REQUEST:", request.httpMethod ?? "", url.absoluteString)
+        
         let (data, response) = try await URLSession.shared.data(for: request)
 
-        if let httpResponse = response as? HTTPURLResponse {
-            print("✅ Status Code: \(httpResponse.statusCode)")
-            
-            guard let http = response as? HTTPURLResponse,
-                  (200...299).contains(http.statusCode) else {
-                throw URLError(.badServerResponse)
-            }
+        print("📦 RESPONSE RAW:")
+        print(String(data: data, encoding: .utf8) ?? "nil")
+        
+        guard let http = response as? HTTPURLResponse,
+              (200...299).contains(http.statusCode) else {
+            throw URLError(.badServerResponse)
         }
 
         return try JSONDecoder().decode(T.self, from: data)

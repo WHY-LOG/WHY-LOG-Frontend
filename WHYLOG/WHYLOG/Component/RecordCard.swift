@@ -19,8 +19,8 @@ struct RecordCard: View {
                     .foregroundColor(.gray525252)
                 Spacer()
                 HStack {
-                    ForEach(record.categories, id: \.self) { text in
-                        ChipButton(text: text, state: .constant(.completed))
+                    ForEach(record.categoryNames, id: \.self) { name in // record.categories 대신 categoryNames 사용
+                        ChipButton(text: name, state: .constant(.completed))
                     }
                 }
             }

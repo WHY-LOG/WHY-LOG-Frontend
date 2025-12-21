@@ -7,76 +7,68 @@
 
 import Foundation
 
-// MARK: - Request
-
-//생성 (POST)
+// MARK: - Request (전송용)
 struct CreateRecordRequest: Encodable {
     let title: String
     let content: String
-    let categoryIds: [Int]
+    let category: [Int] // 명세서 Body 키값 "category"에 맞춤
     let occurDate: String
-
+    
     enum CodingKeys: String, CodingKey {
-        case title
-        case content
-        case categoryIds = "category"
-        case occurDate
+        case title, content, occurDate
+        case category // 서버에서 categoryIds가 아닌 category를 기대할 경우
     }
 }
 
-//수정 (PUT)
 struct UpdateRecordRequest: Encodable {
     let title: String
     let content: String
-    let categoryIds: [Int]
+    let category: [Int]
     let occurDate: String
-
+    
     enum CodingKeys: String, CodingKey {
-        case title
-        case content
-        case categoryIds = "category"
-        case occurDate
+        case title, content, occurDate
+        case category
     }
 }
 
-
-// MARK: - Response
-
-// 공통 Response
+// MARK: - Response Base (공통 응답)
 struct RecordBaseResponse<T: Decodable>: Decodable {
     let resultType: String
     let error: String?
     let success: T
 }
 
-// 타입 별칭 정의
 typealias FetchRecordsResponse = RecordBaseResponse<[RecordDTO]>
 typealias CreateRecordResponse = RecordBaseResponse<RecordDTO>
 typealias UpdateRecordResponse = RecordBaseResponse<RecordDTO>
 typealias DeleteRecordResponse = RecordBaseResponse<Int>
 
-
-// MARK: - Record DTO
-
-struct RecordDTO: Decodable {
+// MARK: - Record DTO (수신용)
+struct RecordDTO: Decodable, Identifiable {
     let recordId: Int
     let title: String
     let content: String
     let occurDate: String
-    let categories: [String]
+    let categories: [CategoryDTO] // 객체 배열 구조 반영
 
     enum CodingKeys: String, CodingKey {
-        case recordId = "id"
+        case recordId = "RecordId" // 스웨거의 대문자 키값 반영
         case title
         case content
         case occurDate
         case categories
     }
+
+    var id: Int { return recordId }
+    
+    // UI에서 이름을 바로 쓰기 위한 편의 변수
+    var categoryNames: [String] {
+        return categories.map { $0.categoryName }
+    }
 }
 
-extension RecordDTO: Identifiable {
-    // 서버가 주는 recordId를 SwiftUI의 id로 쓰겠다고 선언 (서버 데이터 안 바뀜)
-    var id: Int {
-        return self.recordId
-    }
+struct CategoryDTO: Decodable {
+    let categoryId: Int
+    let categoryName: String
 }

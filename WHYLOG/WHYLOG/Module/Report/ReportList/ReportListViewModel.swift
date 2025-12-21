@@ -11,19 +11,25 @@ import Combine
 @MainActor
 final class ReportListViewModel: ObservableObject {
 
-    /// 생성된 리포트 연도 목록
-    @Published var years: [Int] = []
+    @Published var reports: [ReportListItemDTO] = []
+    @Published var isLoading = false
+    @Published var hasError = false
 
-    // MARK: - Mock
-    func loadMock() {
-        years = [2025]
-    }
+    private let reportService = ReportService()
 
-    // MARK: - API (나중에)
-    /*
-    func fetchReports(userId: Int) async throws {
-        let response = try await reportService.fetchReports(userId: userId)
-        years = response.map { $0.year }
+    func load(userId: Int) async {
+        isLoading = true
+        hasError = false
+
+        do {
+            let response = try await reportService.fetchReports(userId: userId)
+            self.reports = response
+        } catch {
+            hasError = true
+            print("❌ Report list load failed:", error)
+        }
+
+        isLoading = false
     }
-    */
 }
+
