@@ -19,20 +19,14 @@ enum AlertType {
 struct ReportResultView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel = ReportResultViewModel()
-    
-    let year: Int
-    let mode: ReportEntryMode
-    
     @State private var isEditing: Bool = false
-
     @State private var writingText: String = ""
-    
     @State private var showAlert = false
     @State private var alertType: AlertType = .edit
     
-    
-    
-    
+    let reportId: Int
+    let year: Int
+    let mode: ReportEntryMode
     
     var body: some View {
         NavigationStack {
@@ -62,7 +56,7 @@ struct ReportResultView: View {
                         action: {
                             Task {
                                 try? await viewModel.updateContent(
-                                    userId: 1,
+                                    userId: 5,
                                     content: writingText
                                 )
                             }
@@ -83,7 +77,7 @@ struct ReportResultView: View {
                             } else {
                                 Task {
                                     do {
-                                        try await viewModel.deleteReport(userId: 1)
+                                        try await viewModel.deleteReport(userId: 5)
                                         dismiss()   // ReportListView로 복귀
                                     } catch {
                                         print("❌ 리포트 삭제 실패:", error)
@@ -102,25 +96,21 @@ struct ReportResultView: View {
             }
         }
         .onAppear {
-            Task {
-                await viewModel.load(
-                    userId: 1,   // TODO: 로그인 연동 후 실제 userId로 교체
-                    year: year
-                )
-                if mode == .create {
-                    isEditing = true
+            viewModel.reportId = reportId   // ⭐️ 핵심
+            
+            if mode == .readOnly {
+                Task {
+                    await viewModel.load(userId: 5, year: year)
                 }
             }
+
+            if mode == .create {
+                isEditing = true
+            }
         }
-        
         .navigationBarBackButtonHidden(true)
     }
-        
 
-
-    
-    
-    
     // MARK: - Navigation Bar
     private var navigationBar: some View {
         // Navigation Bar
@@ -289,12 +279,10 @@ struct ReportResultView: View {
     }
     
 }
-    
 
-    
-#Preview {
-    NavigationStack {
-        ReportResultView(year: 2025, mode: .readOnly)
-            .environmentObject(ReportStore())
-    }
-}
+//#Preview {
+//    NavigationStack {
+//        ReportResultView(year: 2025, mode: .readOnly)
+//            .environmentObject(ReportStore())
+//    }
+//}

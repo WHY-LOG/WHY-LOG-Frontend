@@ -37,31 +37,36 @@ extension APIEndpoint {
     //path
     var path: String {
         switch self {
-
-        case .createReport(let userId),
-             .fetchReports(let userId):
+            
+            // MARK: - Report
+        case .fetchReports(let userId):
             return "/api/users/\(userId)/reports"
-
+            
+        case .createReport(let userId):
+            return "/api/user/\(userId)/reports"
+            
         case .updateReport(let userId, let reportId),
-             .deleteReport(let userId, let reportId):
+                .deleteReport(let userId, let reportId):
             return "/api/users/\(userId)/reports/\(reportId)"
-
+            
+            // MARK: - User
         case .createUser:
             return "/api/user"
-
+            
         case .fetchUser(let userId),
-             .updateUser(let userId),
-             .deleteUser(let userId):
+                .updateUser(let userId),
+                .deleteUser(let userId):
             return "/api/user/\(userId)"
-
+            
+            // MARK: - Record
         case .createRecord(let userId),
-             .fetchRecords(let userId, _, _, _):
+                .fetchRecords(let userId, _, _, _):
             return "/api/users/\(userId)/records"
-
-
-
+            
+            
+            
         case .updateRecord(let userId, let recordId),
-             .deleteRecord(let userId, let recordId):
+                .deleteRecord(let userId, let recordId):
             return "/api/users/\(userId)/records/\(recordId)"
         }
     }

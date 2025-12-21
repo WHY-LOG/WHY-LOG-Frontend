@@ -27,7 +27,6 @@ struct ReportResultDTO: Decodable {
 struct GraphDataDTO: Decodable {
     let categoryId: Int
     let categoryName: String
-    let count: Int
     let percent: Int
 }
 
