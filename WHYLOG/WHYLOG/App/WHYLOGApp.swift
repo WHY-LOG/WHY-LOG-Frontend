@@ -15,6 +15,7 @@ struct WHYLOGApp: App {
     
     var body: some Scene {
         WindowGroup {
+            
             LoginView()
                 .environmentObject(reportStore)
                 .environmentObject(profileModel)
