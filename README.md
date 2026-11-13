@@ -1,6 +1,9 @@
 # 🚀 WHY-LOG
 
-<img width="571" height="240" alt="스크린샷 2025-12-16 오후 4 51 39" src="https://github.com/user-attachments/assets/61586bcf-6a84-4654-b744-4233e411c705" />
+<p align='center'>
+    <img src="https://capsule-render.vercel.app/api?type=waving&color=FFADAD&height=300&section=header&text=WHYLOG&fontSize=70&animation=fadeIn&fontColor=525252&fontAlignY=38&desc=WHY를%20기록하는%20회고%20서비스&descAlignY=51&descAlign=62"/>
+</p>
+
 
 > WHY LOG: WHY를 기록하는 회고 서비스
 [![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)]()
